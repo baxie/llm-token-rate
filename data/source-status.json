@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-05T03:03:01+00:00",
+  "checked_at": "2026-08-05T03:05:25+00:00",
   "sources": [
     {
       "id": "openai",
@@ -12,22 +12,22 @@
       "id": "anthropic",
       "url": "https://docs.anthropic.com/en/docs/about-claude/pricing",
       "http_status": 200,
-      "content_sha256": "97a4139a5a6d33427dba4c0892f8fed7d96a1629071ca45650507dec82095910",
+      "content_sha256": "e2d776350bb3b808636090b0593b42c79d4761b1d219d8df79f58ab65c31ea73",
       "changed": true
     },
     {
       "id": "google",
       "url": "https://ai.google.dev/gemini-api/docs/pricing",
       "http_status": 200,
-      "content_sha256": "3791991021edb2abdbaa567c7ddd88b7fd12c38498589c1b1fb32d086297b785",
+      "content_sha256": "0f6b0db59f8ef4e0bf0fe17399ee051e7f5b371c519a4ff42248019a114cc247",
       "changed": true
     },
     {
       "id": "xai",
       "url": "https://docs.x.ai/docs/models",
-      "http_status": null,
-      "error": "IncompleteRead(0 bytes read)",
-      "changed": false
+      "http_status": 200,
+      "content_sha256": "1db4ffedfc5c2e9d2ce508ec32d77b7b4fbc9ce997aaa2d4290a8c6a726ba0ce",
+      "changed": true
     },
     {
       "id": "mistral",
@@ -46,9 +46,9 @@
     {
       "id": "meta",
       "url": "https://www.llama.com/llama-downloads/",
-      "http_status": null,
-      "error": "IncompleteRead(96812 bytes read)",
-      "changed": false
+      "http_status": 200,
+      "content_sha256": "81cd4ae5a9ed090525fa21cdf2fc3656d5103164134329219d736c85c6d4f82d",
+      "changed": true
     },
     {
       "id": "deepseek",
@@ -62,7 +62,7 @@
       "url": "https://help.aliyun.com/zh/model-studio/models",
       "http_status": 200,
       "content_sha256": "a02bfd6b474044e266d9369136b72b171590f29d678bf47409ff2cc46a0c3490",
-      "changed": true
+      "changed": false
     },
     {
       "id": "moonshot",
@@ -76,7 +76,7 @@
       "url": "https://docs.bigmodel.cn/cn/guide/models/text/glm-4.5",
       "http_status": 200,
       "content_sha256": "c338762d331cae367bc164601807eab3e5114305caa03adf75922da8fec73316",
-      "changed": true
+      "changed": false
     },
     {
       "id": "baidu",
@@ -89,14 +89,14 @@
       "id": "bytedance",
       "url": "https://www.volcengine.com/docs/82379/1099320",
       "http_status": 200,
-      "content_sha256": "37f2bcc39eaef2f137acd706e495f2dc01705b244096d96a22bd3dd3c4583881",
+      "content_sha256": "eacfeab10aa12b4d102469b64dfc2200cfb4a32256d7a9a9808741b7ac5f883d",
       "changed": true
     },
     {
       "id": "tencent",
       "url": "https://cloud.tencent.com/document/product/1729/97732",
       "http_status": 200,
-      "content_sha256": "a723e4c82c3e4613b74b6724ef7ca01ae9553e2c489d539b60861f1c69c2b60c",
+      "content_sha256": "0394b9a0f825c73be527debd5f4d81bc660fbe26ad843aac5a9995811d0e5bf9",
       "changed": true
     },
     {
@@ -104,14 +104,14 @@
       "url": "https://platform.minimaxi.com/docs/guides/pricing-paygo",
       "http_status": 200,
       "content_sha256": "c8549cf5be07c72ef5118c73e0b4ab3e57c4b93aa46dd9ed3ec04721eb032c7e",
-      "changed": true
+      "changed": false
     },
     {
       "id": "stepfun",
       "url": "https://platform.stepfun.com/docs/zh/guides/pricing/intro",
       "http_status": 200,
       "content_sha256": "78acde5ae382f1d1ced665f2c7f97284497796bd56395910a8e08f8d9c2977d8",
-      "changed": true
+      "changed": false
     }
   ]
 }
