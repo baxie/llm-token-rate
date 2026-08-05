@@ -1,7 +1,10 @@
 from decimal import Decimal
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from llm_price_tracker.catalogue import build_markdown, estimate_native_cost, load_agents, load_catalogue, validate_catalogue
+from llm_price_tracker.send_report import make_message
 
 
 class CatalogueTest(unittest.TestCase):
@@ -17,3 +20,12 @@ class CatalogueTest(unittest.TestCase):
         self.assertIn("## Native model APIs", output)
         self.assertIn("## Coding agents / indirect access", output)
         self.assertIn("Cursor", output)
+
+    def test_email_attaches_the_report(self) -> None:
+        with TemporaryDirectory() as directory:
+            report = Path(directory) / "PRICEBOOK.md"
+            report.write_text("# test report\n", encoding="utf-8")
+            message = make_message("sender@gmail.com", "recipient@gmail.com", report)
+        self.assertEqual(message["To"], "recipient@gmail.com")
+        self.assertEqual(message.get_content_type(), "multipart/mixed")
+        self.assertIn("PRICEBOOK.md", message.as_string())

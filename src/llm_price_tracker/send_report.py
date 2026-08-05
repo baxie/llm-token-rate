@@ -1,0 +1,59 @@
+from __future__ import annotations
+
+import argparse
+import os
+import smtplib
+import ssl
+from datetime import UTC, datetime
+from email.message import EmailMessage
+from pathlib import Path
+
+from .catalogue import ROOT, load_catalogue
+
+
+def make_message(sender: str, recipient: str, report: Path) -> EmailMessage:
+    catalogue = load_catalogue()
+    message = EmailMessage()
+    message["Subject"] = f"LLM 价格日报 · {catalogue['snapshot_date']}"
+    message["From"] = sender
+    message["To"] = recipient
+    message.set_content(
+        "LLM Token Price Tracker 已完成本次定时校验。\n\n"
+        f"生成时间（UTC）：{datetime.now(UTC).replace(microsecond=0).isoformat()}\n"
+        f"目录快照日期：{catalogue['snapshot_date']}\n"
+        f"覆盖模型数：{len(catalogue['models'])}\n"
+        "\n附件为最新的 Markdown 价格目录。请以每行链接的官方定价页为最终计费依据。\n"
+        "Coding Agent 的套餐/积分与原生 API Token 单价分开呈现，不能直接等同。\n"
+    )
+    message.add_attachment(
+        report.read_bytes(),
+        maintype="text",
+        subtype="markdown",
+        filename=report.name,
+    )
+    return message
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Email the generated LLM price report via Gmail SMTP")
+    parser.add_argument("--report", type=Path, default=ROOT / "docs" / "PRICEBOOK.md")
+    args = parser.parse_args()
+
+    sender = os.environ["SMTP_USERNAME"]
+    recipient = os.environ["REPORT_RECIPIENT"]
+    password = os.environ["SMTP_PASSWORD"]
+    server = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
+    port = int(os.environ.get("SMTP_PORT", "465"))
+    if not args.report.is_file():
+        raise FileNotFoundError(f"Report not found: {args.report}")
+
+    message = make_message(sender, recipient, args.report)
+    with smtplib.SMTP_SSL(server, port, context=ssl.create_default_context(), timeout=30) as smtp:
+        smtp.login(sender, password)
+        smtp.send_message(message)
+    print(f"Report sent to {recipient}.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

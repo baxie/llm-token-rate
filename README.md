@@ -32,7 +32,21 @@ The rendered comparison is in [docs/PRICEBOOK.md](docs/PRICEBOOK.md).
 
 ## Scheduled verification
 
-The GitHub Actions workflow runs daily at 10:17 China Standard Time and can be triggered manually. It validates the dataset, checks all official pricing URLs, rebuilds the Markdown catalogue, and commits only when source content changes. A content change is a review signal: pricing pages can change for reasons unrelated to prices, so update the corresponding data row after reviewing the official source.
+The GitHub Actions workflow runs daily at 10:17 China Standard Time and can be triggered manually. It validates the dataset, checks all official pricing URLs, rebuilds the Markdown catalogue, emails the generated `PRICEBOOK.md`, and commits only when source content changes. A content change is a review signal: pricing pages can change for reasons unrelated to prices, so update the corresponding data row after reviewing the official source.
+
+### Gmail delivery setup
+
+Create these repository Action secrets under `Settings` → `Secrets and variables` → `Actions`; never put their values in a file or commit.
+
+| Secret | Value |
+|---|---|
+| `SMTP_SERVER` | `smtp.gmail.com` |
+| `SMTP_PORT` | `465` |
+| `SMTP_USERNAME` | Gmail sender address |
+| `SMTP_PASSWORD` | Gmail 16-character App Password |
+| `REPORT_RECIPIENT` | Destination email address |
+
+The sender must have two-step verification and an App Password. The report is sent only after validation and rendering succeed.
 
 ## Updating a price
 
