@@ -17,7 +17,7 @@ def make_message(sender: str, recipient: str, report: Path) -> EmailMessage:
     message["Subject"] = f"LLM 价格日报 · {catalogue['snapshot_date']}"
     message["From"] = sender
     message["To"] = recipient
-    message.set_content(
+    plain_text = (
         "LLM Token Price Tracker 已完成本次定时校验。\n\n"
         f"生成时间（UTC）：{datetime.now(UTC).replace(microsecond=0).isoformat()}\n"
         f"目录快照日期：{catalogue['snapshot_date']}\n"
@@ -25,10 +25,20 @@ def make_message(sender: str, recipient: str, report: Path) -> EmailMessage:
         "\n附件为最新的 Markdown 价格目录。请以每行链接的官方定价页为最终计费依据。\n"
         "Coding Agent 的套餐/积分与原生 API Token 单价分开呈现，不能直接等同。\n"
     )
+    message.set_content(plain_text)
+    message.add_alternative(
+        f"""<!doctype html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#172033;line-height:1.55">
+        <h2 style="margin-bottom:4px">LLM 价格报告已生成</h2>
+        <p style="color:#5b6474">快照日期：<strong>{catalogue['snapshot_date']}</strong> · 覆盖 <strong>{len(catalogue['models'])}</strong> 个模型</p>
+        <p>附件为带样式的 HTML 价格目录，可直接在浏览器打开。每个模型均附官方来源链接；请以该页面为最终计费依据。</p>
+        <p style="padding:12px;background:#fff7ed;border-left:4px solid #f97316">Coding Agent 的套餐、积分与原生 API Token 单价分开呈现，不能直接等同。</p>
+        </body></html>""",
+        subtype="html",
+    )
     message.add_attachment(
         report.read_bytes(),
         maintype="text",
-        subtype="markdown",
+        subtype="html",
         filename=report.name,
     )
     return message
@@ -36,7 +46,7 @@ def make_message(sender: str, recipient: str, report: Path) -> EmailMessage:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Email the generated LLM price report via Gmail SMTP")
-    parser.add_argument("--report", type=Path, default=ROOT / "docs" / "PRICEBOOK.md")
+    parser.add_argument("--report", type=Path, default=ROOT / "docs" / "PRICEBOOK.html")
     args = parser.parse_args()
 
     sender = os.environ["SMTP_USERNAME"].strip()

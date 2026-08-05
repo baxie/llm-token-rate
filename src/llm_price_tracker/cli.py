@@ -4,7 +4,7 @@ import argparse
 from decimal import Decimal
 from pathlib import Path
 
-from .catalogue import AGENT_PATH, DATA_PATH, ROOT, build_markdown, estimate_native_cost, load_agents, load_catalogue, validate_catalogue
+from .catalogue import AGENT_PATH, DATA_PATH, ROOT, build_html, build_markdown, estimate_native_cost, load_agents, load_catalogue, validate_catalogue
 from .refresh import check_sources, write_status
 
 
@@ -23,9 +23,11 @@ def command_build(_: argparse.Namespace) -> int:
     if errors:
         print("Refusing to build invalid catalogue:\n- " + "\n- ".join(errors))
         return 1
-    output = ROOT / "docs" / "PRICEBOOK.md"
-    output.write_text(build_markdown(catalogue, agents), encoding="utf-8")
-    print(f"Built {output.relative_to(ROOT)} from {DATA_PATH.name} and {AGENT_PATH.name}.")
+    markdown_output = ROOT / "docs" / "PRICEBOOK.md"
+    html_output = ROOT / "docs" / "PRICEBOOK.html"
+    markdown_output.write_text(build_markdown(catalogue, agents), encoding="utf-8")
+    html_output.write_text(build_html(catalogue, agents), encoding="utf-8")
+    print(f"Built {markdown_output.relative_to(ROOT)} and {html_output.relative_to(ROOT)} from {DATA_PATH.name} and {AGENT_PATH.name}.")
     return 0
 
 

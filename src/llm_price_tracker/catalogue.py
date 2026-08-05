@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from html import escape
 from collections import defaultdict
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -123,6 +124,63 @@ def build_markdown(catalogue: dict[str, Any], agents: dict[str, Any]) -> str:
         "- Coding-agent usage can include hidden context, retries, tool calls, and provider routing. Do not divide a subscription fee by visible chat tokens and label it an API price.",
     ])
     return "\n".join(lines) + "\n"
+
+
+def build_html(catalogue: dict[str, Any], agents: dict[str, Any]) -> str:
+    def source_link(source_id: str) -> str:
+        source = next(source for source in catalogue["sources"] if source["id"] == source_id)
+        return f'<a href="{escape(source["url"], quote=True)}">官方来源</a>'
+
+    native_rows = []
+    for item in sorted(catalogue["models"], key=lambda row: (row["provider"], row["model"])):
+        if item["availability"] != "api":
+            cells = [item["provider"], item["model"], f'{item["segment"]} ({item["availability"]})', "—", "—", "—"]
+        else:
+            prices = item["prices"]
+            cells = [
+                item["provider"], item["model"], item["segment"], native_price(item, "input"), native_price(item, "output"),
+                f'{usd(prices.get("input_usd_per_mtok"))} / {usd(prices.get("output_usd_per_mtok"))}',
+            ]
+        native_rows.append("<tr>" + "".join(f"<td>{escape(str(cell))}</td>" for cell in cells) + f"<td>{source_link(item['source_id'])}</td></tr>")
+
+    agent_rows = []
+    for product in agents["products"]:
+        for plan in product["plans"]:
+            cells = [product["name"], plan["name"], usd(plan.get("monthly_usd")), plan["usage_unit"], plan["model_access"]]
+            agent_rows.append(
+                "<tr>" + "".join(f"<td>{escape(str(cell))}</td>" for cell in cells)
+                + f'<td><a href="{escape(product["source_url"], quote=True)}">官方来源</a></td></tr>'
+            )
+
+    return f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Price Catalogue · {escape(catalogue['snapshot_date'])}</title>
+  <style>
+    :root {{ color-scheme: light; --ink:#172033; --muted:#5b6474; --line:#dfe5ee; --surface:#f6f8fb; --accent:#2563eb; }}
+    body {{ margin:0; color:var(--ink); background:var(--surface); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }}
+    main {{ max-width:1440px; margin:auto; padding:32px 20px 48px; }}
+    header {{ padding:26px 28px; background:linear-gradient(135deg,#172554,#2563eb); color:white; border-radius:16px; }}
+    h1 {{ margin:0 0 6px; font-size:28px; }} h2 {{ margin:34px 0 12px; font-size:20px; }} p {{ color:var(--muted); }} header p {{ color:#dbeafe; margin:0; }}
+    .table-wrap {{ overflow-x:auto; background:white; border:1px solid var(--line); border-radius:12px; box-shadow:0 1px 2px #1720330d; }}
+    table {{ width:100%; border-collapse:collapse; white-space:nowrap; }} th,td {{ padding:11px 14px; text-align:left; border-bottom:1px solid var(--line); }}
+    th {{ position:sticky; top:0; background:#eef4ff; font-weight:650; color:#1e3a8a; }} tr:last-child td {{ border-bottom:0; }} tr:hover td {{ background:#fafcff; }}
+    td:nth-child(4),td:nth-child(5),td:nth-child(6) {{ text-align:right; font-variant-numeric:tabular-nums; }} a {{ color:var(--accent); text-decoration:none; }} a:hover {{ text-decoration:underline; }}
+    .note {{ background:#fff7ed; border-left:4px solid #f97316; padding:14px 16px; border-radius:6px; }}
+  </style>
+</head>
+<body><main>
+  <header><h1>LLM Price Catalogue</h1><p>快照日期：{escape(catalogue['snapshot_date'])} · 所有价格以官方页面为准</p></header>
+  <h2>原生模型 API</h2>
+  <div class="table-wrap"><table><thead><tr><th>厂商</th><th>模型</th><th>定位</th><th>原币输入 / MTok</th><th>原币输出 / MTok</th><th>USD 输入 / 输出</th><th>来源</th></tr></thead><tbody>{''.join(native_rows)}</tbody></table></div>
+  <h2>Coding Agent / 间接调用</h2>
+  <div class="table-wrap"><table><thead><tr><th>产品</th><th>套餐</th><th>月度标价</th><th>计费单位</th><th>模型访问</th><th>来源</th></tr></thead><tbody>{''.join(agent_rows)}</tbody></table></div>
+  <h2>口径说明</h2>
+  <div class="note">MTok = 100 万 Token。Coding Agent 的套餐、积分、隐藏上下文与模型路由不等同于原生 API Token 单价；CNY 的 USD 数值仅用于横向比较，不是结算报价。</div>
+</main></body></html>
+"""
 
 
 def status_payload(results: list[dict[str, Any]]) -> dict[str, Any]:

@@ -21,7 +21,7 @@ PYTHONPATH=src python3 -m llm_price_tracker.cli estimate \
   --model anthropic-claude-sonnet-4 --input-mtok 2 --output-mtok 0.5
 ```
 
-The rendered comparison is in [docs/PRICEBOOK.md](docs/PRICEBOOK.md).
+The rendered comparison is in [docs/PRICEBOOK.html](docs/PRICEBOOK.html); [docs/PRICEBOOK.md](docs/PRICEBOOK.md) remains as a GitHub-friendly text version.
 
 ## Pricing semantics
 
@@ -32,7 +32,7 @@ The rendered comparison is in [docs/PRICEBOOK.md](docs/PRICEBOOK.md).
 
 ## Scheduled verification
 
-The GitHub Actions workflow runs daily at 10:17 China Standard Time and can be triggered manually. It validates the dataset, checks all official pricing URLs, rebuilds the Markdown catalogue, emails the generated `PRICEBOOK.md`, and commits only when source content changes. A content change is a review signal: pricing pages can change for reasons unrelated to prices, so update the corresponding data row after reviewing the official source.
+The GitHub Actions workflow runs daily at 10:17 China Standard Time and can be triggered manually. It validates the dataset, checks all official pricing URLs, rebuilds the HTML and Markdown catalogues, emails the generated `PRICEBOOK.html`, and commits only when source content changes. A content change is a review signal: pricing pages can change for reasons unrelated to prices, so update the corresponding data row after reviewing the official source.
 
 ### Gmail delivery setup
 

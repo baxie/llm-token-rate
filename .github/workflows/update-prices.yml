@@ -37,7 +37,7 @@ jobs:
         env:
           PYTHONPATH: src
       - name: Email latest price report
-        run: python -m llm_price_tracker.send_report --report docs/PRICEBOOK.md
+        run: python -m llm_price_tracker.send_report --report docs/PRICEBOOK.html
         env:
           PYTHONPATH: src
           SMTP_SERVER: ${{ secrets.SMTP_SERVER }}

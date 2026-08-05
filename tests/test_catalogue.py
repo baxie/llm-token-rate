@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from llm_price_tracker.catalogue import build_markdown, estimate_native_cost, load_agents, load_catalogue, validate_catalogue
+from llm_price_tracker.catalogue import build_html, build_markdown, estimate_native_cost, load_agents, load_catalogue, validate_catalogue
 from llm_price_tracker.send_report import make_message
 
 
@@ -21,14 +21,21 @@ class CatalogueTest(unittest.TestCase):
         self.assertIn("## Coding agents / indirect access", output)
         self.assertIn("Cursor", output)
 
+    def test_html_render_includes_tables_and_sources(self) -> None:
+        output = build_html(load_catalogue(), load_agents())
+        self.assertIn("<table>", output)
+        self.assertIn("官方来源", output)
+        self.assertIn("Coding Agent / 间接调用", output)
+
     def test_email_attaches_the_report(self) -> None:
         with TemporaryDirectory() as directory:
-            report = Path(directory) / "PRICEBOOK.md"
-            report.write_text("# test report\n", encoding="utf-8")
+            report = Path(directory) / "PRICEBOOK.html"
+            report.write_text("<h1>test report</h1>\n", encoding="utf-8")
             message = make_message("sender@gmail.com", "recipient@gmail.com", report)
         self.assertEqual(message["To"], "recipient@gmail.com")
         self.assertEqual(message.get_content_type(), "multipart/mixed")
-        self.assertIn("PRICEBOOK.md", message.as_string())
+        self.assertIn("PRICEBOOK.html", message.as_string())
+        self.assertIn("text/html", message.as_string())
 
     def test_app_password_whitespace_is_removed(self) -> None:
         self.assertEqual("".join("abcd\u00a0efgh ijkl\tmnop".split()), "abcdefghijklmnop")
