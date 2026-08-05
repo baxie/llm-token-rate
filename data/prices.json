@@ -1,14 +1,18 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "snapshot_date": "2026-08-05",
   "fx_usd_per_cny": 0.139,
+  "latest_model_ids": ["openai-gpt-5.6-sol", "openai-gpt-5.6-terra", "openai-gpt-5.6-luna"],
   "sources": [
     {"id": "openai", "url": "https://openai.com/api/pricing/"},
+    {"id": "openai-gpt-5.6-sol", "url": "https://developers.openai.com/api/docs/models/gpt-5.6-sol", "discovery_pattern": "GPT-5\\.[0-9]+ (?:Sol|Terra|Luna)"},
+    {"id": "openai-gpt-5.6-terra", "url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra", "discovery_pattern": "GPT-5\\.[0-9]+ (?:Sol|Terra|Luna)"},
+    {"id": "openai-gpt-5.6-luna", "url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna", "discovery_pattern": "GPT-5\\.[0-9]+ (?:Sol|Terra|Luna)"},
     {"id": "anthropic", "url": "https://docs.anthropic.com/en/docs/about-claude/pricing"},
     {"id": "google", "url": "https://ai.google.dev/gemini-api/docs/pricing"},
     {"id": "xai", "url": "https://docs.x.ai/docs/models"},
-    {"id": "mistral", "url": "https://docs.mistral.ai/platform/pricing/"},
-    {"id": "cohere", "url": "https://docs.cohere.com/docs/pricing"},
+    {"id": "mistral", "url": "https://mistral.ai/pricing/api/"},
+    {"id": "cohere", "url": "https://docs.cohere.com/docs/how-does-cohere-pricing-work"},
     {"id": "meta", "url": "https://www.llama.com/llama-downloads/"},
     {"id": "deepseek", "url": "https://api-docs.deepseek.com/quick_start/pricing"},
     {"id": "qwen", "url": "https://help.aliyun.com/zh/model-studio/models"},
@@ -21,6 +25,30 @@
     {"id": "stepfun", "url": "https://platform.stepfun.com/docs/zh/guides/pricing/intro"}
   ],
   "models": [
+    {
+      "id": "openai-gpt-5.6-sol", "provider": "OpenAI", "model": "GPT-5.6 Sol", "aliases": ["gpt-5.6"], "segment": "旗舰 / 最强 Agent 与复杂工作流", "availability": "api", "status": "active", "last_verified_at": "2026-08-05", "context_window_tokens": 1050000, "max_output_tokens": 128000,
+      "native_currency": "USD", "native_prices_per_mtok": {"input": 5, "output": 30, "cache_read": 0.5, "cache_write": 6.25}, "prices": {"input_usd_per_mtok": 5, "output_usd_per_mtok": 30, "cache_read_usd_per_mtok": 0.5, "cache_write_usd_per_mtok": 6.25},
+      "pricing_tiers": [
+        {"label": "≤272K input", "max_input_tokens": 272000, "input_usd_per_mtok": 5, "cache_read_usd_per_mtok": 0.5, "cache_write_usd_per_mtok": 6.25, "output_usd_per_mtok": 30},
+        {"label": ">272K input", "min_input_tokens": 272001, "input_usd_per_mtok": 10, "cache_read_usd_per_mtok": 1, "cache_write_usd_per_mtok": 12.5, "output_usd_per_mtok": 45}
+      ], "source_id": "openai-gpt-5.6-sol", "pricing_note": "超过 272K 输入 Token 的长上下文请求使用更高档位；cache write 单列。"
+    },
+    {
+      "id": "openai-gpt-5.6-terra", "provider": "OpenAI", "model": "GPT-5.6 Terra", "segment": "均衡 / 更低单价", "availability": "api", "status": "active", "last_verified_at": "2026-08-05", "context_window_tokens": 1050000, "max_output_tokens": 128000,
+      "native_currency": "USD", "native_prices_per_mtok": {"input": 2, "output": 12, "cache_read": 0.2, "cache_write": 2.5}, "prices": {"input_usd_per_mtok": 2, "output_usd_per_mtok": 12, "cache_read_usd_per_mtok": 0.2, "cache_write_usd_per_mtok": 2.5},
+      "pricing_tiers": [
+        {"label": "≤272K input", "max_input_tokens": 272000, "input_usd_per_mtok": 2, "cache_read_usd_per_mtok": 0.2, "cache_write_usd_per_mtok": 2.5, "output_usd_per_mtok": 12},
+        {"label": ">272K input", "min_input_tokens": 272001, "input_usd_per_mtok": 4, "cache_read_usd_per_mtok": 0.4, "cache_write_usd_per_mtok": 5, "output_usd_per_mtok": 18}
+      ], "source_id": "openai-gpt-5.6-terra", "pricing_note": "超过 272K 输入 Token 的长上下文请求使用更高档位；cache write 单列。"
+    },
+    {
+      "id": "openai-gpt-5.6-luna", "provider": "OpenAI", "model": "GPT-5.6 Luna", "segment": "高吞吐 / 最低单价", "availability": "api", "status": "active", "last_verified_at": "2026-08-05", "context_window_tokens": 1050000, "max_output_tokens": 128000,
+      "native_currency": "USD", "native_prices_per_mtok": {"input": 0.2, "output": 1.2, "cache_read": 0.02, "cache_write": 0.25}, "prices": {"input_usd_per_mtok": 0.2, "output_usd_per_mtok": 1.2, "cache_read_usd_per_mtok": 0.02, "cache_write_usd_per_mtok": 0.25},
+      "pricing_tiers": [
+        {"label": "≤272K input", "max_input_tokens": 272000, "input_usd_per_mtok": 0.2, "cache_read_usd_per_mtok": 0.02, "cache_write_usd_per_mtok": 0.25, "output_usd_per_mtok": 1.2},
+        {"label": ">272K input", "min_input_tokens": 272001, "input_usd_per_mtok": 0.4, "cache_read_usd_per_mtok": 0.04, "cache_write_usd_per_mtok": 0.5, "output_usd_per_mtok": 1.8}
+      ], "source_id": "openai-gpt-5.6-luna", "pricing_note": "超过 272K 输入 Token 的长上下文请求使用更高档位；cache write 单列。"
+    },
     {"id":"openai-gpt-5","provider":"OpenAI","model":"GPT-5","segment":"旗舰 / 推理与通用","availability":"api","native_currency":"USD","native_prices_per_mtok":{"input":1.25,"output":10,"cache_read":0.125},"prices":{"input_usd_per_mtok":1.25,"output_usd_per_mtok":10,"cache_read_usd_per_mtok":0.125},"source_id":"openai"},
     {"id":"openai-gpt-5-mini","provider":"OpenAI","model":"GPT-5 mini","segment":"均衡 / 高性价比","availability":"api","native_currency":"USD","native_prices_per_mtok":{"input":0.25,"output":2,"cache_read":0.025},"prices":{"input_usd_per_mtok":0.25,"output_usd_per_mtok":2,"cache_read_usd_per_mtok":0.025},"source_id":"openai"},
     {"id":"openai-gpt-5-nano","provider":"OpenAI","model":"GPT-5 nano","segment":"轻量 / 高吞吐","availability":"api","native_currency":"USD","native_prices_per_mtok":{"input":0.05,"output":0.4,"cache_read":0.005},"prices":{"input_usd_per_mtok":0.05,"output_usd_per_mtok":0.4,"cache_read_usd_per_mtok":0.005},"source_id":"openai"},

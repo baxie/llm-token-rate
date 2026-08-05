@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 import json
-from html import escape
 from collections import defaultdict
 from datetime import UTC, datetime
 from decimal import Decimal
+from html import escape
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA_PATH = ROOT / "data" / "prices.json"
 AGENT_PATH = ROOT / "data" / "coding_agents.json"
+AGENT_RATE_PATH = ROOT / "data" / "agent_model_rates.json"
+DISCOVERY_PATH = ROOT / "data" / "model-discovery.json"
+MTOK = Decimal("1000000")
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -25,10 +28,21 @@ def load_agents() -> dict[str, Any]:
     return load_json(AGENT_PATH)
 
 
+def load_agent_rates() -> dict[str, Any]:
+    return load_json(AGENT_RATE_PATH)
+
+
 def usd(value: Decimal | str | float | int | None) -> str:
     if value is None:
         return "—"
-    return f"${Decimal(str(value)).quantize(Decimal('0.0001')).normalize():f}"
+    rendered = Decimal(str(value)).quantize(Decimal("0.0001")).normalize()
+    return f"${rendered:f}"
+
+
+def number(value: Decimal | str | float | int | None) -> str:
+    if value is None:
+        return "—"
+    return f"{Decimal(str(value)).quantize(Decimal('0.0001')).normalize():f}"
 
 
 def native_price(item: dict[str, Any], key: str) -> str:
@@ -36,6 +50,107 @@ def native_price(item: dict[str, Any], key: str) -> str:
     if price is None:
         return "—"
     return f"{item.get('native_currency', 'USD')} {Decimal(str(price)).normalize():f}"
+
+
+def source_index(*collections: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        source["id"]: source
+        for collection in collections
+        for source in collection.get("sources", [])
+    }
+
+
+def model_index(catalogue: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {model["id"]: model for model in catalogue["models"]}
+
+
+def product_index(agents: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {product["id"]: product for product in agents["products"]}
+
+
+def tier_for_input(pricing: dict[str, Any], input_mtok: Decimal) -> dict[str, Any]:
+    """Select a declared input-size tier, falling back to the legacy flat price."""
+    tiers = pricing.get("pricing_tiers")
+    if not tiers:
+        return pricing.get("prices", pricing)
+    input_tokens = input_mtok * MTOK
+    for tier in tiers:
+        maximum = tier.get("max_input_tokens")
+        minimum = tier.get("min_input_tokens")
+        if maximum is not None and input_tokens <= Decimal(str(maximum)):
+            return tier
+        if minimum is not None and input_tokens >= Decimal(str(minimum)):
+            return tier
+    return tiers[-1]
+
+
+def estimate_priced_usage(
+    pricing: dict[str, Any],
+    input_mtok: Decimal,
+    output_mtok: Decimal,
+    cached_input_mtok: Decimal = Decimal("0"),
+    cache_write_mtok: Decimal = Decimal("0"),
+) -> Decimal:
+    tier = tier_for_input(pricing, input_mtok)
+    input_price = Decimal(str(tier["input_usd_per_mtok"]))
+    standard_input = max(input_mtok - cached_input_mtok - cache_write_mtok, Decimal("0"))
+    cache_read_price = Decimal(str(tier.get("cache_read_usd_per_mtok", input_price)))
+    cache_write_price = Decimal(str(tier.get("cache_write_usd_per_mtok", input_price)))
+    return (
+        standard_input * input_price
+        + output_mtok * Decimal(str(tier["output_usd_per_mtok"]))
+        + cached_input_mtok * cache_read_price
+        + cache_write_mtok * cache_write_price
+    )
+
+
+def estimate_native_cost(
+    model: dict[str, Any],
+    input_mtok: Decimal,
+    output_mtok: Decimal,
+    cached_input_mtok: Decimal = Decimal("0"),
+    cache_write_mtok: Decimal = Decimal("0"),
+) -> Decimal:
+    return estimate_priced_usage(model, input_mtok, output_mtok, cached_input_mtok, cache_write_mtok)
+
+
+def default_overage_usd(product: dict[str, Any]) -> Decimal | None:
+    for plan in product["plans"]:
+        if plan.get("overage_usd_per_unit") is not None:
+            return Decimal(str(plan["overage_usd_per_unit"]))
+    return None
+
+
+def estimate_agent_rate(
+    rate: dict[str, Any],
+    catalogue: dict[str, Any],
+    agents: dict[str, Any],
+    scenario: dict[str, Any],
+) -> dict[str, Decimal | str | None]:
+    """Return only what the vendor pricing makes quantitatively defensible."""
+    input_mtok = Decimal(str(scenario["input_mtok"]))
+    cached_input_mtok = Decimal(str(scenario.get("cached_input_mtok", 0)))
+    output_mtok = Decimal(str(scenario["output_mtok"]))
+    mode = rate["billing_mode"]
+    if mode == "agent_token_price":
+        cost = estimate_priced_usage(rate, input_mtok, output_mtok, cached_input_mtok)
+        credit_usd = rate.get("credit_usd")
+        credits = cost / Decimal(str(credit_usd)) if credit_usd else None
+        return {"usage": credits, "usd": cost, "unit": rate["unit"], "basis": "published token price"}
+    if mode == "native_api_price":
+        model = model_index(catalogue)[rate["model_id"]]
+        cost = estimate_native_cost(model, input_mtok, output_mtok, cached_input_mtok)
+        return {"usage": cost, "usd": cost, "unit": rate["unit"], "basis": "selected model list price"}
+    if mode in {"credit_multiplier", "fixed_prompt_credit"}:
+        credits = Decimal(str(scenario["base_prompt_credits"])) * Decimal(str(rate["credit_multiplier"]))
+        overage = default_overage_usd(product_index(agents)[rate["agent_id"]])
+        return {
+            "usage": credits,
+            "usd": credits * overage if overage is not None else None,
+            "unit": rate["unit"],
+            "basis": "published model credit multiplier",
+        }
+    return {"usage": None, "usd": None, "unit": rate["unit"], "basis": "no fixed agent multiplier published"}
 
 
 def validate_catalogue(catalogue: dict[str, Any]) -> list[str]:
@@ -57,100 +172,211 @@ def validate_catalogue(catalogue: dict[str, Any]) -> list[str]:
         for key, price in item.get("prices", {}).items():
             if not isinstance(price, (int, float)) or price < 0:
                 errors.append(f"{item.get('id')}: {key} must be a non-negative number")
+        previous_maximum = None
+        for tier in item.get("pricing_tiers", []):
+            for price_key in ("input_usd_per_mtok", "output_usd_per_mtok"):
+                if price_key not in tier or not isinstance(tier[price_key], (int, float)) or tier[price_key] < 0:
+                    errors.append(f"{item.get('id')}: tier {tier.get('label', '?')} has invalid {price_key}")
+            maximum = tier.get("max_input_tokens")
+            if maximum is not None:
+                if not isinstance(maximum, int) or maximum <= 0:
+                    errors.append(f"{item.get('id')}: tier max_input_tokens must be a positive integer")
+                if previous_maximum is not None and maximum <= previous_maximum:
+                    errors.append(f"{item.get('id')}: pricing tiers must be ascending")
+                previous_maximum = maximum
     return errors
 
 
-def estimate_native_cost(model: dict[str, Any], input_mtok: Decimal, output_mtok: Decimal,
-                         cached_input_mtok: Decimal = Decimal("0")) -> Decimal:
-    prices = model["prices"]
-    standard_input = max(input_mtok - cached_input_mtok, Decimal("0"))
-    return (
-        standard_input * Decimal(str(prices["input_usd_per_mtok"]))
-        + output_mtok * Decimal(str(prices["output_usd_per_mtok"]))
-        + cached_input_mtok * Decimal(str(prices.get("cache_read_usd_per_mtok", prices["input_usd_per_mtok"])))
-    )
+def validate_agent_data(catalogue: dict[str, Any], agents: dict[str, Any], rates: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    product_ids: set[str] = set()
+    for product in agents.get("products", []):
+        if {"id", "name", "source_url", "billing_model", "plans"} - product.keys():
+            errors.append(f"agent product {product.get('name', '<unknown>')}: missing required fields")
+        if product.get("id") in product_ids:
+            errors.append(f"duplicate agent product id: {product['id']}")
+        product_ids.add(product.get("id"))
+        for plan in product.get("plans", []):
+            for key in ("name", "monthly_usd", "included_amount", "included_unit", "model_access", "billing_note"):
+                if key not in plan:
+                    errors.append(f"{product.get('id')}: plan missing {key}")
+            for key in ("monthly_usd", "included_amount", "overage_usd_per_unit"):
+                value = plan.get(key)
+                if value is not None and (not isinstance(value, (int, float)) or value < 0):
+                    errors.append(f"{product.get('id')}: plan {plan.get('name')} invalid {key}")
+    rate_sources = {source["id"] for source in rates.get("sources", [])}
+    known_models = set(model_index(catalogue))
+    rate_ids: set[str] = set()
+    permitted_modes = {"agent_token_price", "native_api_price", "credit_multiplier", "fixed_prompt_credit", "provider_token_price"}
+    for rate in rates.get("rates", []):
+        for key in ("id", "agent_id", "model", "billing_mode", "unit", "availability", "source_id", "note"):
+            if key not in rate:
+                errors.append(f"agent model rate {rate.get('id', '<unknown>')}: missing {key}")
+        if rate.get("id") in rate_ids:
+            errors.append(f"duplicate agent model rate id: {rate['id']}")
+        rate_ids.add(rate.get("id"))
+        if rate.get("agent_id") not in product_ids:
+            errors.append(f"{rate.get('id')}: unknown agent_id")
+        if rate.get("source_id") not in rate_sources:
+            errors.append(f"{rate.get('id')}: unknown source_id")
+        if rate.get("billing_mode") not in permitted_modes:
+            errors.append(f"{rate.get('id')}: unsupported billing_mode")
+        if rate.get("model_id") and rate["model_id"] not in known_models:
+            errors.append(f"{rate.get('id')}: unknown model_id")
+        if rate.get("billing_mode") == "native_api_price" and not rate.get("model_id"):
+            errors.append(f"{rate.get('id')}: native_api_price requires model_id")
+        if rate.get("billing_mode") in {"credit_multiplier", "fixed_prompt_credit"}:
+            if not isinstance(rate.get("credit_multiplier"), (int, float)) or rate["credit_multiplier"] < 0:
+                errors.append(f"{rate.get('id')}: missing or invalid credit_multiplier")
+        if rate.get("billing_mode") == "agent_token_price" and not (rate.get("prices") or rate.get("pricing_tiers")):
+            errors.append(f"{rate.get('id')}: agent_token_price needs prices or pricing_tiers")
+    return errors
 
 
-def build_markdown(catalogue: dict[str, Any], agents: dict[str, Any]) -> str:
-    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for model in catalogue["models"]:
-        grouped[model["provider"]].append(model)
+def pricing_label(item: dict[str, Any]) -> str:
+    if not item.get("pricing_tiers"):
+        return "标准"
+    return "；".join(tier["label"] for tier in item["pricing_tiers"])
+
+
+def source_markdown(source: dict[str, Any]) -> str:
+    return f"[官方]({source['url']})"
+
+
+def estimate_label(estimate: dict[str, Decimal | str | None]) -> str:
+    if estimate["usage"] is None and estimate["usd"] is None:
+        return "不可量化（无固定倍率）"
+    usage = f"{number(estimate['usage'])} {estimate['unit']}" if estimate["usage"] is not None else str(estimate["unit"])
+    if estimate["usd"] is not None:
+        usage += f" ≈ {usd(estimate['usd'])}"
+    return usage
+
+
+def build_markdown(catalogue: dict[str, Any], agents: dict[str, Any], rates: dict[str, Any] | None = None) -> str:
+    rates = rates or load_agent_rates()
+    sources = source_index(catalogue, rates)
+    products = product_index(agents)
+    medium = next(s for s in rates["scenarios"] if s["id"] == "coding-task")
     lines = [
         "# LLM Price Catalogue",
         "",
-        f"> Snapshot: `{catalogue['snapshot_date']}`. Prices are list prices unless a row says otherwise. "
-        "Check the linked official source before purchase.",
+        f"> Snapshot: `{catalogue['snapshot_date']}`. Official list prices and public agent billing rules only; check the linked source before purchase.",
         "",
-        "## Native model APIs",
+        "## 本次重点：OpenAI GPT‑5.6 系列",
         "",
-        "| Provider | Model | Positioning | Native input / MTok | Native output / MTok | USD input / output | Source |",
-        "|---|---|---|---:|---:|---:|---|",
+        "| 模型 | 定位 | 上下文 | 默认输入 / 输出（USD / MTok） | 长上下文规则 | 官方来源 |",
+        "|---|---|---:|---:|---|---|",
     ]
-    for provider in sorted(grouped):
-        for item in grouped[provider]:
-            prices = item.get("prices", {})
-            source = next(s for s in catalogue["sources"] if s["id"] == item["source_id"])
-            if item["availability"] != "api":
-                lines.append(f"| {provider} | {item['model']} | {item['segment']} ({item['availability']}) | — | — | — | [official]({source['url']}) |")
-                continue
-            lines.append(
-                f"| {provider} | {item['model']} | {item['segment']} | "
-                f"{native_price(item, 'input')} | {native_price(item, 'output')} | "
-                f"{usd(prices.get('input_usd_per_mtok'))} / {usd(prices.get('output_usd_per_mtok'))} | [official]({source['url']}) |"
-            )
+    latest = set(catalogue.get("latest_model_ids", []))
+    for item in catalogue["models"]:
+        if item["id"] not in latest:
+            continue
+        lines.append(
+            f"| {item['model']} | {item['segment']} | {item.get('context_window_tokens', '—'):,} | "
+            f"{usd(item['prices']['input_usd_per_mtok'])} / {usd(item['prices']['output_usd_per_mtok'])} | "
+            f"{item.get('pricing_note', '—')} | {source_markdown(sources[item['source_id']])} |"
+        )
     lines.extend([
         "",
-        "## Coding agents / indirect access",
+        "## 原生模型 API（全量）",
         "",
-        "These are product plans or credit systems, not native token list prices. An effective per-token price is only shown where the vendor explicitly publishes a fixed overage rate.",
+        "| 厂商 | 模型 | 生命周期 | 定位 | 输入 / MTok | 输出 / MTok | 价格档位 | 来源 |",
+        "|---|---|---|---|---:|---:|---|---|",
+    ])
+    for item in sorted(catalogue["models"], key=lambda row: (row["provider"], row["model"])):
+        source = sources[item["source_id"]]
+        if item["availability"] != "api":
+            lines.append(f"| {item['provider']} | {item['model']} | {item.get('status', '—')} | {item['segment']} ({item['availability']}) | — | — | — | {source_markdown(source)} |")
+            continue
+        lines.append(
+            f"| {item['provider']} | {item['model']} | {item.get('status', 'active')} | {item['segment']} | "
+            f"{native_price(item, 'input')} | {native_price(item, 'output')} | {pricing_label(item)} | {source_markdown(source)} |"
+        )
+    lines.extend([
         "",
-        "| Product | Plan | Monthly list price | Usage unit | Model access | Source |",
-        "|---|---|---:|---|---|---|",
+        "## Coding Agent 套餐与可用额度",
+        "",
+        "| 产品 | 套餐 | 月度标价 | 含量 | 超额标价 | 计费口径 | 官方来源 |",
+        "|---|---|---:|---|---:|---|---|",
     ])
     for product in agents["products"]:
         for plan in product["plans"]:
+            included = f"{number(plan['included_amount'])} {plan['included_unit']}" if plan["included_amount"] is not None else plan["included_unit"]
             lines.append(
-                f"| {product['name']} | {plan['name']} | {usd(plan.get('monthly_usd'))} | "
-                f"{plan['usage_unit']} | {plan['model_access']} | [official]({product['source_url']}) |"
+                f"| {product['name']} | {plan['name']} | {usd(plan['monthly_usd'])} | {included} | "
+                f"{usd(plan.get('overage_usd_per_unit'))} | {plan['billing_note']} | [官方]({product['source_url']}) |"
             )
     lines.extend([
         "",
-        "## Interpretation",
+        "## Agent × 模型消耗对比",
         "",
-        "- `MTok` means one million tokens. Input and output are charged separately; reasoning tokens are commonly billed as output tokens.",
-        "- USD is the native list currency for global suppliers. CNY rows retain their source price and add a comparison-only USD conversion using the recorded `fx_usd_per_cny` snapshot; it is not a billing quote.",
-        "- Cached-input prices apply only when the provider confirms a cache hit. Cache writes, image, audio, tool, batch, regional, and long-context pricing may be separate.",
-        "- Hosted open-weight models are marked `partner/self-hosted`: there is no single Meta-native API list price to compare.",
-        "- Coding-agent usage can include hidden context, retries, tool calls, and provider routing. Do not divide a subscription fee by visible chat tokens and label it an API price.",
+        f"情景：**{medium['label']}**（输入 {medium['input_mtok']} MTok、缓存命中 {medium['cached_input_mtok']} MTok、输出 {medium['output_mtok']} MTok；Credit 产品以 1 个基础任务为基准）。订阅内额度不在此扣除，估算仅用于比较单次消耗或超额成本。",
+        "",
+        "| Agent | 模型 | 计费方式 | 模型级消耗 / 该情景 | 可用性 | 来源 |",
+        "|---|---|---|---|---|---|",
+    ])
+    for rate in sorted(rates["rates"], key=lambda row: (products[row["agent_id"]]["name"], row["model"])):
+        estimate = estimate_agent_rate(rate, catalogue, agents, medium)
+        lines.append(
+            f"| {products[rate['agent_id']]['name']} | {rate['model']} | {rate['billing_mode']} | "
+            f"{estimate_label(estimate)} | {rate['availability']} | {source_markdown(sources[rate['source_id']])} |"
+        )
+    lines.extend([
+        "",
+        "## 解释与边界",
+        "",
+        "- `MTok` = 100 万 Token。原生 API 的输入、输出、缓存读取与缓存写入可分别计费；当前工作量情景不包含 cache write。",
+        "- Cursor 的 selected-model 行是官方声明的 API list-price pass-through，不表示 GPT‑5.6 一定已出现在 Cursor 当日选择器中。",
+        "- Kiro 的倍率作用于随任务复杂度变化的基础 Credits，因此不能诚实地换算成固定 Token 单价。",
+        "- Copilot 当前以 `$0.01 / AI credit` 按 Token 价格折算。Copilot 旧 premium-request 口径不用于本表的模型级对比。",
+        "- Windsurf 以每条用户 Prompt 的模型倍率计费，模型矩阵会动态变化；Cline 和 Roo Code 不发布固定平台 Credit 倍率，使用所选模型的提供商价格。",
+        "- CNY 模型的 USD 列仅用于横向比较，不是结算报价。自托管/合作方托管模型没有唯一的原厂 API 价格。",
     ])
     return "\n".join(lines) + "\n"
 
 
-def build_html(catalogue: dict[str, Any], agents: dict[str, Any]) -> str:
-    def source_link(source_id: str) -> str:
-        source = next(source for source in catalogue["sources"] if source["id"] == source_id)
+def build_html(catalogue: dict[str, Any], agents: dict[str, Any], rates: dict[str, Any] | None = None) -> str:
+    rates = rates or load_agent_rates()
+    sources = source_index(catalogue, rates)
+    products = product_index(agents)
+    medium = next(s for s in rates["scenarios"] if s["id"] == "coding-task")
+
+    def link(source: dict[str, Any]) -> str:
         return f'<a href="{escape(source["url"], quote=True)}">官方来源</a>'
+
+    def cells(values: list[Any]) -> str:
+        return "".join(f"<td>{escape(str(value))}</td>" for value in values)
+
+    latest_rows = []
+    for item in catalogue["models"]:
+        if item["id"] in set(catalogue.get("latest_model_ids", [])):
+            latest_rows.append("<tr>" + cells([
+                item["model"], item["segment"], f"{item.get('context_window_tokens', 0):,}",
+                f"{usd(item['prices']['input_usd_per_mtok'])} / {usd(item['prices']['output_usd_per_mtok'])}", item.get("pricing_note", "—"),
+            ]) + f"<td>{link(sources[item['source_id']])}</td></tr>")
 
     native_rows = []
     for item in sorted(catalogue["models"], key=lambda row: (row["provider"], row["model"])):
         if item["availability"] != "api":
-            cells = [item["provider"], item["model"], f'{item["segment"]} ({item["availability"]})', "—", "—", "—"]
+            row = [item["provider"], item["model"], item.get("status", "—"), f"{item['segment']} ({item['availability']})", "—", "—", "—"]
         else:
-            prices = item["prices"]
-            cells = [
-                item["provider"], item["model"], item["segment"], native_price(item, "input"), native_price(item, "output"),
-                f'{usd(prices.get("input_usd_per_mtok"))} / {usd(prices.get("output_usd_per_mtok"))}',
-            ]
-        native_rows.append("<tr>" + "".join(f"<td>{escape(str(cell))}</td>" for cell in cells) + f"<td>{source_link(item['source_id'])}</td></tr>")
+            row = [item["provider"], item["model"], item.get("status", "active"), item["segment"], native_price(item, "input"), native_price(item, "output"), pricing_label(item)]
+        native_rows.append("<tr>" + cells(row) + f"<td>{link(sources[item['source_id']])}</td></tr>")
 
-    agent_rows = []
+    plan_rows = []
     for product in agents["products"]:
         for plan in product["plans"]:
-            cells = [product["name"], plan["name"], usd(plan.get("monthly_usd")), plan["usage_unit"], plan["model_access"]]
-            agent_rows.append(
-                "<tr>" + "".join(f"<td>{escape(str(cell))}</td>" for cell in cells)
-                + f'<td><a href="{escape(product["source_url"], quote=True)}">官方来源</a></td></tr>'
-            )
+            included = f"{number(plan['included_amount'])} {plan['included_unit']}" if plan["included_amount"] is not None else plan["included_unit"]
+            plan_rows.append("<tr>" + cells([
+                product["name"], plan["name"], usd(plan["monthly_usd"]), included, usd(plan.get("overage_usd_per_unit")), plan["billing_note"],
+            ]) + f'<td><a href="{escape(product["source_url"], quote=True)}">官方来源</a></td></tr>')
+
+    rate_rows = []
+    for rate in sorted(rates["rates"], key=lambda row: (products[row["agent_id"]]["name"], row["model"])):
+        estimate = estimate_agent_rate(rate, catalogue, agents, medium)
+        rate_rows.append("<tr>" + cells([
+            products[rate["agent_id"]]["name"], rate["model"], rate["billing_mode"], estimate_label(estimate), rate["availability"], rate["note"],
+        ]) + f"<td>{link(sources[rate['source_id']])}</td></tr>")
 
     return f"""<!doctype html>
 <html lang="zh-CN">
@@ -159,28 +385,25 @@ def build_html(catalogue: dict[str, Any], agents: dict[str, Any]) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LLM Price Catalogue · {escape(catalogue['snapshot_date'])}</title>
   <style>
-    :root {{ color-scheme: light; --ink:#172033; --muted:#5b6474; --line:#dfe5ee; --surface:#f6f8fb; --accent:#2563eb; }}
-    body {{ margin:0; color:var(--ink); background:var(--surface); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }}
-    main {{ max-width:1440px; margin:auto; padding:32px 20px 48px; }}
-    header {{ padding:26px 28px; background:linear-gradient(135deg,#172554,#2563eb); color:white; border-radius:16px; }}
-    h1 {{ margin:0 0 6px; font-size:28px; }} h2 {{ margin:34px 0 12px; font-size:20px; }} p {{ color:var(--muted); }} header p {{ color:#dbeafe; margin:0; }}
-    .table-wrap {{ overflow-x:auto; background:white; border:1px solid var(--line); border-radius:12px; box-shadow:0 1px 2px #1720330d; }}
-    table {{ width:100%; border-collapse:collapse; white-space:nowrap; }} th,td {{ padding:11px 14px; text-align:left; border-bottom:1px solid var(--line); }}
-    th {{ position:sticky; top:0; background:#eef4ff; font-weight:650; color:#1e3a8a; }} tr:last-child td {{ border-bottom:0; }} tr:hover td {{ background:#fafcff; }}
-    td:nth-child(4),td:nth-child(5),td:nth-child(6) {{ text-align:right; font-variant-numeric:tabular-nums; }} a {{ color:var(--accent); text-decoration:none; }} a:hover {{ text-decoration:underline; }}
-    .note {{ background:#fff7ed; border-left:4px solid #f97316; padding:14px 16px; border-radius:6px; }}
+    :root {{ color-scheme:light; --ink:#172033; --muted:#5b6474; --line:#dfe5ee; --surface:#f6f8fb; --accent:#2563eb; --panel:#ffffff; }}
+    * {{ box-sizing:border-box; }} body {{ margin:0; color:var(--ink); background:var(--surface); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }}
+    main {{ max-width:1500px; margin:auto; padding:32px 20px 52px; }} header {{ padding:28px; background:linear-gradient(135deg,#172554,#2563eb); color:white; border-radius:16px; }}
+    h1 {{ margin:0 0 6px; font-size:29px; }} h2 {{ margin:36px 0 12px; font-size:21px; }} p {{ color:var(--muted); }} header p {{ color:#dbeafe; margin:0; }}
+    .summary {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:18px 0 4px; }} .card {{ padding:15px; background:var(--panel); border:1px solid var(--line); border-radius:12px; }} .card strong {{ display:block; color:#1e3a8a; font-size:18px; }}
+    .table-wrap {{ overflow-x:auto; background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:0 1px 2px #1720330d; }} table {{ width:100%; border-collapse:collapse; white-space:nowrap; }} th,td {{ padding:11px 14px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; }} th {{ position:sticky; top:0; background:#eef4ff; font-weight:650; color:#1e3a8a; }} tr:last-child td {{ border-bottom:0; }} tr:hover td {{ background:#fafcff; }}
+    td:nth-child(3),td:nth-child(5),td:nth-child(6) {{ font-variant-numeric:tabular-nums; }} a {{ color:var(--accent); text-decoration:none; }} a:hover {{ text-decoration:underline; }} .note {{ background:#fff7ed; border-left:4px solid #f97316; padding:14px 16px; border-radius:6px; color:#7c2d12; }} .muted {{ color:var(--muted); }}
   </style>
 </head>
 <body><main>
-  <header><h1>LLM Price Catalogue</h1><p>快照日期：{escape(catalogue['snapshot_date'])} · 所有价格以官方页面为准</p></header>
-  <h2>原生模型 API</h2>
-  <div class="table-wrap"><table><thead><tr><th>厂商</th><th>模型</th><th>定位</th><th>原币输入 / MTok</th><th>原币输出 / MTok</th><th>USD 输入 / 输出</th><th>来源</th></tr></thead><tbody>{''.join(native_rows)}</tbody></table></div>
-  <h2>Coding Agent / 间接调用</h2>
-  <div class="table-wrap"><table><thead><tr><th>产品</th><th>套餐</th><th>月度标价</th><th>计费单位</th><th>模型访问</th><th>来源</th></tr></thead><tbody>{''.join(agent_rows)}</tbody></table></div>
-  <h2>口径说明</h2>
-  <div class="note">MTok = 100 万 Token。Coding Agent 的套餐、积分、隐藏上下文与模型路由不等同于原生 API Token 单价；CNY 的 USD 数值仅用于横向比较，不是结算报价。</div>
-</main></body></html>
-"""
+  <header><h1>LLM Price Catalogue</h1><p>快照日期：{escape(catalogue['snapshot_date'])} · 原生模型价格、Agent 套餐与模型级 Credit / 用量对比</p></header>
+  <section class="summary"><div class="card"><strong>{len(catalogue['models'])}</strong>覆盖模型</div><div class="card"><strong>{len(agents['products'])}</strong>编程 Agent</div><div class="card"><strong>{len(rates['rates'])}</strong>模型级 Agent 规则</div><div class="card"><strong>官方页面</strong>每日变更检测</div></section>
+  <h2>本次重点：OpenAI GPT‑5.6 系列</h2><p>Sol 为最强 Agent / 工作流档，Terra 为均衡档，Luna 为高吞吐档。长上下文档位与缓存写入费用已单列。</p>
+  <div class="table-wrap"><table><thead><tr><th>模型</th><th>定位</th><th>上下文 Tokens</th><th>默认输入 / 输出（USD / MTok）</th><th>长上下文规则</th><th>来源</th></tr></thead><tbody>{''.join(latest_rows)}</tbody></table></div>
+  <h2>原生模型 API（全量）</h2><div class="table-wrap"><table><thead><tr><th>厂商</th><th>模型</th><th>生命周期</th><th>定位</th><th>原币输入 / MTok</th><th>原币输出 / MTok</th><th>价格档位</th><th>来源</th></tr></thead><tbody>{''.join(native_rows)}</tbody></table></div>
+  <h2>Coding Agent 套餐与可用额度</h2><p>订阅费与模型级消耗分开呈现；含量可抵扣的单位由产品自行定义，不能直接当作 Token。</p><div class="table-wrap"><table><thead><tr><th>产品</th><th>套餐</th><th>月度标价</th><th>含量</th><th>超额标价</th><th>计费口径</th><th>来源</th></tr></thead><tbody>{''.join(plan_rows)}</tbody></table></div>
+  <h2>Agent × 模型消耗对比</h2><p>情景：{escape(medium['label'])}（输入 {medium['input_mtok']} MTok、缓存命中 {medium['cached_input_mtok']} MTok、输出 {medium['output_mtok']} MTok；Credit 产品以 1 个基础任务为基准）。估算不包含订阅内额度。</p><div class="table-wrap"><table><thead><tr><th>Agent</th><th>模型</th><th>计费方式</th><th>模型级消耗 / 该情景</th><th>可用性</th><th>口径</th><th>来源</th></tr></thead><tbody>{''.join(rate_rows)}</tbody></table></div>
+  <h2>解释与边界</h2><div class="note">MTok = 100 万 Token。Cursor 的 selected-model 口径是 API list-price pass-through，是否可选须以其当日模型选择器为准。Kiro 的 Credit 倍率作用于随任务复杂度变化的基础 Credits；Windsurf 以每条用户 Prompt 的模型倍率计费；Cline 与 Roo Code 没有公开的固定平台倍率。Copilot 的模型级用量为 $0.01 / AI Credit 的 Token 价折算。</div>
+</main></body></html>\n"""
 
 
 def status_payload(results: list[dict[str, Any]]) -> dict[str, Any]:

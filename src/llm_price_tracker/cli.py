@@ -2,14 +2,26 @@ from __future__ import annotations
 
 import argparse
 from decimal import Decimal
-from pathlib import Path
-
-from .catalogue import AGENT_PATH, DATA_PATH, ROOT, build_html, build_markdown, estimate_native_cost, load_agents, load_catalogue, validate_catalogue
-from .refresh import check_sources, write_status
+from .catalogue import (
+    AGENT_PATH,
+    AGENT_RATE_PATH,
+    DATA_PATH,
+    ROOT,
+    build_html,
+    build_markdown,
+    estimate_native_cost,
+    load_agent_rates,
+    load_agents,
+    load_catalogue,
+    validate_agent_data,
+    validate_catalogue,
+)
+from .refresh import check_sources, write_discovery, write_status
 
 
 def command_validate(_: argparse.Namespace) -> int:
-    errors = validate_catalogue(load_catalogue())
+    catalogue, agents, rates = load_catalogue(), load_agents(), load_agent_rates()
+    errors = validate_catalogue(catalogue) + validate_agent_data(catalogue, agents, rates)
     if errors:
         print("Catalogue validation failed:\n- " + "\n- ".join(errors))
         return 1
@@ -18,25 +30,35 @@ def command_validate(_: argparse.Namespace) -> int:
 
 
 def command_build(_: argparse.Namespace) -> int:
-    catalogue, agents = load_catalogue(), load_agents()
-    errors = validate_catalogue(catalogue)
+    catalogue, agents, rates = load_catalogue(), load_agents(), load_agent_rates()
+    errors = validate_catalogue(catalogue) + validate_agent_data(catalogue, agents, rates)
     if errors:
         print("Refusing to build invalid catalogue:\n- " + "\n- ".join(errors))
         return 1
     markdown_output = ROOT / "docs" / "PRICEBOOK.md"
     html_output = ROOT / "docs" / "PRICEBOOK.html"
-    markdown_output.write_text(build_markdown(catalogue, agents), encoding="utf-8")
-    html_output.write_text(build_html(catalogue, agents), encoding="utf-8")
-    print(f"Built {markdown_output.relative_to(ROOT)} and {html_output.relative_to(ROOT)} from {DATA_PATH.name} and {AGENT_PATH.name}.")
+    markdown_output.write_text(build_markdown(catalogue, agents, rates), encoding="utf-8")
+    html_output.write_text(build_html(catalogue, agents, rates), encoding="utf-8")
+    print(
+        f"Built {markdown_output.relative_to(ROOT)} and {html_output.relative_to(ROOT)} from "
+        f"{DATA_PATH.name}, {AGENT_PATH.name}, and {AGENT_RATE_PATH.name}."
+    )
     return 0
 
 
 def command_refresh(args: argparse.Namespace) -> int:
-    payload, changed = check_sources(args.timeout)
+    payload, discovery, changed = check_sources(args.timeout)
     status_path = ROOT / "data" / "source-status.json"
+    discovery_path = ROOT / "data" / "model-discovery.json"
     if changed or not status_path.exists():
         write_status(payload)
-        print(f"Checked {len(payload['sources'])} official sources; persisted a changed source snapshot.")
+    if changed or not discovery_path.exists():
+        write_discovery(discovery)
+    if changed:
+        print(
+            f"Checked {len(payload['sources'])} official sources; persisted changed source or model-discovery evidence "
+            f"({len(discovery['untracked_candidates'])} untracked candidate(s))."
+        )
     else:
         print(f"Checked {len(payload['sources'])} official sources; no content change detected.")
     return 0

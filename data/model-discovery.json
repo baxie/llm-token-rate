@@ -1,0 +1,32 @@
+{
+  "checked_at": "2026-08-05T07:04:29+00:00",
+  "candidates": [
+    {
+      "source_id": "openai-gpt-5.6-sol",
+      "model": "GPT-5.6 Sol",
+      "known": true
+    },
+    {
+      "source_id": "openai-gpt-5.6-terra",
+      "model": "GPT-5.6 Sol",
+      "known": true
+    },
+    {
+      "source_id": "openai-gpt-5.6-terra",
+      "model": "GPT-5.6 Terra",
+      "known": true
+    },
+    {
+      "source_id": "openai-gpt-5.6-luna",
+      "model": "GPT-5.6 Luna",
+      "known": true
+    },
+    {
+      "source_id": "openai-gpt-5.6-luna",
+      "model": "GPT-5.6 Terra",
+      "known": true
+    }
+  ],
+  "untracked_candidates": [],
+  "note": "Pattern matches are review candidates only. They do not automatically change the audited price catalogue."
+}

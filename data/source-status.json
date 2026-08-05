@@ -1,53 +1,96 @@
 {
-  "checked_at": "2026-08-05T06:20:29+00:00",
+  "checked_at": "2026-08-05T07:04:29+00:00",
   "sources": [
     {
       "id": "openai",
       "url": "https://openai.com/api/pricing/",
       "http_status": 403,
-      "error": "HTTP Error 403: Forbidden",
+      "error": "HTTP Error 403: Forbidden; curl fallback: HTTP 403",
       "changed": false
+    },
+    {
+      "id": "openai-gpt-5.6-sol",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+      "http_status": 200,
+      "content_sha256": "788a8d287a3c2f66c4313a683234f606a0b63112b90b14cedb98eda4186377ab",
+      "fetch_method": "curl-fallback",
+      "model_candidates": [
+        "GPT-5.6 Sol"
+      ],
+      "changed": true,
+      "change_kind": "new_source_baseline"
+    },
+    {
+      "id": "openai-gpt-5.6-terra",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+      "http_status": 200,
+      "content_sha256": "a64d58b8526c18dde25cadeeeec6860582bb50ea0ab3ed66b1f2d4234fcb2fa9",
+      "fetch_method": "curl-fallback",
+      "model_candidates": [
+        "GPT-5.6 Sol",
+        "GPT-5.6 Terra"
+      ],
+      "changed": true,
+      "change_kind": "new_source_baseline"
+    },
+    {
+      "id": "openai-gpt-5.6-luna",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+      "http_status": 200,
+      "content_sha256": "b31573aff4e13da67d0cef8e43209844dcb76d0c493be5452503888e94dbd93c",
+      "fetch_method": "curl-fallback",
+      "model_candidates": [
+        "GPT-5.6 Luna",
+        "GPT-5.6 Terra"
+      ],
+      "changed": true,
+      "change_kind": "new_source_baseline"
     },
     {
       "id": "anthropic",
       "url": "https://docs.anthropic.com/en/docs/about-claude/pricing",
       "http_status": 200,
-      "content_sha256": "5cadfcce73884ee31864f2b3ab1a2fddb9788985ca345ed6109bb2c9ce46e915",
+      "content_sha256": "b4c5d1391c03f99ae8c44b1509ddbe2a1ae564f9140032642b2ed985b79caf16",
       "changed": true
     },
     {
       "id": "google",
       "url": "https://ai.google.dev/gemini-api/docs/pricing",
       "http_status": 200,
-      "content_sha256": "8b2f9254304a4580cee940144c9f4b6f14a29a21e365b98ae90be7ec5c489502",
+      "content_sha256": "7d21e83d647f2a682f6a1273b62d7cfd5d2d19f249f7c23dc3169ca9ab51773c",
       "changed": true
     },
     {
       "id": "xai",
       "url": "https://docs.x.ai/docs/models",
       "http_status": 200,
-      "content_sha256": "13495d6af999ad046b6634e7704e2a1e2bd414cf4ffd01bb8026c514d7b38399",
-      "changed": true
+      "content_sha256": "f8a5e885f0e568e939515a7bb1f61962dcc7028083e84cb0bd2f4ce4a247b359",
+      "fetch_method": "curl-fallback",
+      "changed": true,
+      "change_kind": "new_source_baseline"
     },
     {
       "id": "mistral",
-      "url": "https://docs.mistral.ai/platform/pricing/",
-      "http_status": 404,
-      "error": "HTTP Error 404: Not Found",
-      "changed": false
+      "url": "https://mistral.ai/pricing/api/",
+      "http_status": 206,
+      "content_sha256": "56f190ce1e322b2f4748206a1a459e8da9bc83b90e6de5d96ef7516d07463a3c",
+      "fetch_method": "curl-fallback",
+      "changed": true,
+      "change_kind": "new_source_baseline"
     },
     {
       "id": "cohere",
-      "url": "https://docs.cohere.com/docs/pricing",
-      "http_status": 404,
-      "error": "HTTP Error 404: Not Found",
-      "changed": false
+      "url": "https://docs.cohere.com/docs/how-does-cohere-pricing-work",
+      "http_status": 200,
+      "content_sha256": "370968622ce91c460eb45e23be97071790fdae2d4e2495e27f877cd8ee5d1742",
+      "changed": true
     },
     {
       "id": "meta",
       "url": "https://www.llama.com/llama-downloads/",
       "http_status": 200,
-      "content_sha256": "be029522142cda4fb718d4b8e04806646878c08e03bfb032addc154c061d7afa",
+      "content_sha256": "81bd59df15043254bae8bb062c50362fb9d4f19481d151585819a568a3d5adf2",
+      "fetch_method": "curl-fallback",
       "changed": true
     },
     {
@@ -89,14 +132,14 @@
       "id": "bytedance",
       "url": "https://www.volcengine.com/docs/82379/1099320",
       "http_status": 200,
-      "content_sha256": "c952835e8a2db5901eb87b4f097bd38ff1bc312195d7ca286eef7510aeeaf9fa",
+      "content_sha256": "be17e010f701f00b3735612ff247fdaedde041e60a3a94ecad63429e693fb8c8",
       "changed": true
     },
     {
       "id": "tencent",
       "url": "https://cloud.tencent.com/document/product/1729/97732",
       "http_status": 200,
-      "content_sha256": "39f1586d24f3221a5554d0880954f84103d4a7edbb2695a55f61df5c6711b79f",
+      "content_sha256": "b6aeef967055efa93989ef29f015f09db73eaf8f5dc0d0907afef13be872bf4c",
       "changed": true
     },
     {
@@ -112,6 +155,75 @@
       "http_status": 200,
       "content_sha256": "78acde5ae382f1d1ced665f2c7f97284497796bd56395910a8e08f8d9c2977d8",
       "changed": false
+    },
+    {
+      "id": "cursor-pricing",
+      "url": "https://docs.cursor.com/account/pricing",
+      "http_status": 200,
+      "content_sha256": "11decff40b98794f7b03c25d4ec1e673c9a41c8c9532d03f78d7bae932dcd378",
+      "changed": true
+    },
+    {
+      "id": "kiro-models",
+      "url": "https://kiro.dev/docs/models",
+      "http_status": 200,
+      "content_sha256": "d0ea2edd3c8d40bbed6d6877b799659ace592c458d114dec92a8cbed1fd8706d",
+      "changed": true
+    },
+    {
+      "id": "github-copilot-model-pricing",
+      "url": "https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing",
+      "http_status": 200,
+      "content_sha256": "ea741eb23e9bc0df88c08951361ac8fb70637e09eeea776ce676c86b10b89894",
+      "changed": true
+    },
+    {
+      "id": "windsurf-models",
+      "url": "https://docs.windsurf.com/windsurf/models",
+      "http_status": 200,
+      "content_sha256": "b2b2d7ef7fd185c17fb5a7274fa2db24941c3016133918053b84d2c30c86bfc4",
+      "fetch_method": "curl-fallback",
+      "changed": true,
+      "change_kind": "new_source_baseline"
+    },
+    {
+      "id": "cline-model-providers",
+      "url": "https://docs.cline.bot/getting-started/authorizing-with-cline",
+      "http_status": 200,
+      "content_sha256": "f9c8966e2a60f777a7596267cb5e3a85fde1942feae5542fd9cefd869ec91843",
+      "fetch_method": "curl-fallback",
+      "changed": true,
+      "change_kind": "new_source_baseline"
+    },
+    {
+      "id": "roo-model-providers",
+      "url": "https://roocodeinc.github.io/Roo-Code/",
+      "http_status": 200,
+      "content_sha256": "6b61522323ab64b1c4d0fe0d36028f83cb87b909a1873fb5104efdaabd3b6f4d",
+      "changed": true
+    },
+    {
+      "id": "agent-plan-kiro",
+      "url": "https://kiro.dev/pricing/",
+      "http_status": 200,
+      "content_sha256": "8beadbef7767481a2984ccd8a95bcc6a14339eb4bbdbc3d3c92611238ed76fc5",
+      "changed": true
+    },
+    {
+      "id": "agent-plan-github-copilot",
+      "url": "https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals",
+      "http_status": 200,
+      "content_sha256": "b8ba68a4d9a3fb3d1fa3cb33240d31dcbacc03fdcdb8cf4de0a2ef95be8f2c16",
+      "changed": true
+    },
+    {
+      "id": "agent-plan-windsurf",
+      "url": "https://docs.windsurf.com/windsurf/accounts/usage",
+      "http_status": 200,
+      "content_sha256": "e743cbf46c0d47f2fa4fa4e40320ff8f319154d652d7095507c4804c2c159bdb",
+      "fetch_method": "curl-fallback",
+      "changed": true,
+      "change_kind": "new_source_baseline"
     }
   ]
 }

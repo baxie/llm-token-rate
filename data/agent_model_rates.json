@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-08-05",
+  "sources": [
+    {"id": "cursor-pricing", "url": "https://docs.cursor.com/account/pricing"},
+    {"id": "kiro-models", "url": "https://kiro.dev/docs/models"},
+    {"id": "github-copilot-model-pricing", "url": "https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing"},
+    {"id": "windsurf-models", "url": "https://docs.windsurf.com/windsurf/models"},
+    {"id": "cline-model-providers", "url": "https://docs.cline.bot/getting-started/authorizing-with-cline"},
+    {"id": "roo-model-providers", "url": "https://roocodeinc.github.io/Roo-Code/"}
+  ],
+  "scenarios": [
+    {"id": "small", "label": "小请求", "input_mtok": 0.02, "cached_input_mtok": 0.01, "output_mtok": 0.002, "base_prompt_credits": 1},
+    {"id": "coding-task", "label": "一次中等编码任务", "input_mtok": 0.15, "cached_input_mtok": 0.05, "output_mtok": 0.015, "base_prompt_credits": 1},
+    {"id": "large-context", "label": "长上下文任务", "input_mtok": 0.4, "cached_input_mtok": 0.1, "output_mtok": 0.04, "base_prompt_credits": 1}
+  ],
+  "rates": [
+    {
+      "id": "cursor-auto", "agent_id": "cursor", "model": "Cursor Auto", "billing_mode": "agent_token_price", "unit": "USD Agent API usage", "availability": "active", "source_id": "cursor-pricing",
+      "prices": {"input_usd_per_mtok": 1.25, "cache_read_usd_per_mtok": 0.25, "output_usd_per_mtok": 6},
+      "note": "Cursor 公开的 Auto 消耗率；不是某一原生模型的价格。"
+    },
+    {
+      "id": "cursor-gpt-5.6-sol", "agent_id": "cursor", "model": "GPT-5.6 Sol（如当前模型选择器可用）", "model_id": "openai-gpt-5.6-sol", "billing_mode": "native_api_price", "unit": "USD Agent API usage", "availability": "model-selection-dependent", "source_id": "cursor-pricing",
+      "note": "Cursor 声明选定模型按 API list price 消耗用量；模型是否可选须以当日选择器为准。"
+    },
+    {
+      "id": "cursor-gpt-5.6-terra", "agent_id": "cursor", "model": "GPT-5.6 Terra（如当前模型选择器可用）", "model_id": "openai-gpt-5.6-terra", "billing_mode": "native_api_price", "unit": "USD Agent API usage", "availability": "model-selection-dependent", "source_id": "cursor-pricing",
+      "note": "Cursor 声明选定模型按 API list price 消耗用量；模型是否可选须以当日选择器为准。"
+    },
+    {
+      "id": "cursor-gpt-5.6-luna", "agent_id": "cursor", "model": "GPT-5.6 Luna（如当前模型选择器可用）", "model_id": "openai-gpt-5.6-luna", "billing_mode": "native_api_price", "unit": "USD Agent API usage", "availability": "model-selection-dependent", "source_id": "cursor-pricing",
+      "note": "Cursor 声明选定模型按 API list price 消耗用量；模型是否可选须以当日选择器为准。"
+    },
+    {"id": "kiro-gpt-5.6-sol", "agent_id": "kiro", "model": "GPT-5.6 Sol", "model_id": "openai-gpt-5.6-sol", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 2.4, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-gpt-5.6-terra", "agent_id": "kiro", "model": "GPT-5.6 Terra", "model_id": "openai-gpt-5.6-terra", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 1.2, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-gpt-5.6-luna", "agent_id": "kiro", "model": "GPT-5.6 Luna", "model_id": "openai-gpt-5.6-luna", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 0.6, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-claude-opus-5", "agent_id": "kiro", "model": "Claude Opus 5", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 2.2, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-claude-sonnet-5", "agent_id": "kiro", "model": "Claude Sonnet 5", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 1.3, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-claude-haiku-4.5", "agent_id": "kiro", "model": "Claude Haiku 4.5", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 0.4, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-minimax-m2.5", "agent_id": "kiro", "model": "MiniMax M2.5", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 0.25, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-glm-5", "agent_id": "kiro", "model": "GLM-5", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 0.5, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-deepseek-v3.2", "agent_id": "kiro", "model": "DeepSeek V3.2", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 0.25, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {"id": "kiro-qwen3-coder-next", "agent_id": "kiro", "model": "Qwen3 Coder Next", "billing_mode": "credit_multiplier", "unit": "Kiro credits", "credit_multiplier": 0.05, "availability": "active", "source_id": "kiro-models", "note": "实际基础 Credits 随任务复杂度变化；此处为官方模型倍率。"},
+    {
+      "id": "copilot-gpt-5.6-sol", "agent_id": "github-copilot", "model": "GPT-5.6 Sol", "model_id": "openai-gpt-5.6-sol", "billing_mode": "agent_token_price", "unit": "GitHub AI credits", "credit_usd": 0.01, "availability": "active", "source_id": "github-copilot-model-pricing",
+      "pricing_tiers": [
+        {"label": "≤272K input", "max_input_tokens": 272000, "input_usd_per_mtok": 5, "cache_read_usd_per_mtok": 0.5, "cache_write_usd_per_mtok": 6.25, "output_usd_per_mtok": 30},
+        {"label": ">272K input", "min_input_tokens": 272001, "input_usd_per_mtok": 10, "cache_read_usd_per_mtok": 1, "cache_write_usd_per_mtok": 12.5, "output_usd_per_mtok": 45}
+      ], "note": "AI Credits 按发布的 Token 单价折算；1 credit = $0.01。"
+    },
+    {
+      "id": "copilot-gpt-5.6-terra", "agent_id": "github-copilot", "model": "GPT-5.6 Terra", "model_id": "openai-gpt-5.6-terra", "billing_mode": "agent_token_price", "unit": "GitHub AI credits", "credit_usd": 0.01, "availability": "active", "source_id": "github-copilot-model-pricing",
+      "pricing_tiers": [
+        {"label": "≤272K input", "max_input_tokens": 272000, "input_usd_per_mtok": 2, "cache_read_usd_per_mtok": 0.2, "cache_write_usd_per_mtok": 2.5, "output_usd_per_mtok": 12},
+        {"label": ">272K input", "min_input_tokens": 272001, "input_usd_per_mtok": 4, "cache_read_usd_per_mtok": 0.4, "cache_write_usd_per_mtok": 5, "output_usd_per_mtok": 18}
+      ], "note": "AI Credits 按发布的 Token 单价折算；1 credit = $0.01。"
+    },
+    {
+      "id": "copilot-gpt-5.6-luna", "agent_id": "github-copilot", "model": "GPT-5.6 Luna", "model_id": "openai-gpt-5.6-luna", "billing_mode": "agent_token_price", "unit": "GitHub AI credits", "credit_usd": 0.01, "availability": "active", "source_id": "github-copilot-model-pricing",
+      "pricing_tiers": [
+        {"label": "≤200K input", "max_input_tokens": 200000, "input_usd_per_mtok": 0.2, "cache_read_usd_per_mtok": 0.02, "cache_write_usd_per_mtok": 0.25, "output_usd_per_mtok": 1.2},
+        {"label": ">200K input", "min_input_tokens": 200001, "input_usd_per_mtok": 0.4, "cache_read_usd_per_mtok": 0.04, "cache_write_usd_per_mtok": 0.5, "output_usd_per_mtok": 1.8}
+      ], "note": "AI Credits 按发布的 Token 单价折算；1 credit = $0.01。"
+    },
+    {"id": "windsurf-swe-1.6", "agent_id": "windsurf", "model": "SWE-1.6", "billing_mode": "fixed_prompt_credit", "unit": "prompt credits", "credit_multiplier": 0, "availability": "active", "source_id": "windsurf-models", "note": "每条用户 Prompt 的模型倍率；模型矩阵可能动态更新。"},
+    {"id": "windsurf-claude-opus-4.6", "agent_id": "windsurf", "model": "Claude Opus 4.6", "billing_mode": "fixed_prompt_credit", "unit": "prompt credits", "credit_multiplier": 6, "availability": "active", "source_id": "windsurf-models", "note": "每条用户 Prompt 的模型倍率；模型矩阵可能动态更新。"},
+    {"id": "windsurf-claude-opus-4.7-low", "agent_id": "windsurf", "model": "Claude Opus 4.7（low thinking）", "billing_mode": "fixed_prompt_credit", "unit": "prompt credits", "credit_multiplier": 20, "availability": "active", "source_id": "windsurf-models", "note": "每条用户 Prompt 的模型倍率；模型矩阵可能动态更新。"},
+    {"id": "windsurf-claude-opus-4.7-medium", "agent_id": "windsurf", "model": "Claude Opus 4.7（medium thinking）", "billing_mode": "fixed_prompt_credit", "unit": "prompt credits", "credit_multiplier": 40, "availability": "active", "source_id": "windsurf-models", "note": "每条用户 Prompt 的模型倍率；模型矩阵可能动态更新。"},
+    {"id": "cline-byok", "agent_id": "cline", "model": "所选提供商模型（BYOK / Provider）", "billing_mode": "provider_token_price", "unit": "provider-billed USD", "availability": "selected-model-dependent", "source_id": "cline-model-providers", "note": "没有可公开、固定的 Cline Credit 倍率；应引用所选模型的原生行。"},
+    {"id": "roo-code-byok", "agent_id": "roo-code", "model": "所选提供商模型（BYOK，历史）", "billing_mode": "provider_token_price", "unit": "provider-billed USD", "availability": "discontinued", "source_id": "roo-model-providers", "note": "Roo Code 已停止；历史上没有可公开、固定的 Credit 倍率。"}
+  ]
+}

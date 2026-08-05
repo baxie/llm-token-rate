@@ -1,83 +1,126 @@
 # LLM Price Catalogue
 
-> Snapshot: `2026-08-05`. Prices are list prices unless a row says otherwise. Check the linked official source before purchase.
+> Snapshot: `2026-08-05`. Official list prices and public agent billing rules only; check the linked source before purchase.
 
-## Native model APIs
+## 本次重点：OpenAI GPT‑5.6 系列
 
-| Provider | Model | Positioning | Native input / MTok | Native output / MTok | USD input / output | Source |
-|---|---|---|---:|---:|---:|---|
-| Alibaba Cloud | Qwen-Max | 旗舰 / 通用 | CNY 2.4 | CNY 9.6 | $0.334 / $1.334 | [official](https://help.aliyun.com/zh/model-studio/models) |
-| Alibaba Cloud | Qwen-Plus | 均衡 / 通用 | CNY 0.8 | CNY 2 | $0.111 / $0.278 | [official](https://help.aliyun.com/zh/model-studio/models) |
-| Alibaba Cloud | Qwen-Turbo | 轻量 / 高吞吐 | CNY 0.3 | CNY 0.6 | $0.042 / $0.083 | [official](https://help.aliyun.com/zh/model-studio/models) |
-| Alibaba Cloud | Qwen Coder | 代码 | CNY 1.5 | CNY 6 | $0.209 / $0.834 | [official](https://help.aliyun.com/zh/model-studio/models) |
-| Anthropic | Claude Opus 4.1 | 旗舰 / 高难推理 | USD 15 | USD 75 | $15 / $75 | [official](https://docs.anthropic.com/en/docs/about-claude/pricing) |
-| Anthropic | Claude Sonnet 4 | 均衡 / 编码 | USD 3 | USD 15 | $3 / $15 | [official](https://docs.anthropic.com/en/docs/about-claude/pricing) |
-| Anthropic | Claude Haiku 3.5 | 轻量 / 高吞吐 | USD 0.8 | USD 4 | $0.8 / $4 | [official](https://docs.anthropic.com/en/docs/about-claude/pricing) |
-| Baidu | ERNIE 4.5 | 旗舰 / 通用 | CNY 4 | CNY 16 | $0.556 / $2.224 | [official](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/6ltgkz7is) |
-| Baidu | ERNIE X1 | 推理 | CNY 2 | CNY 8 | $0.278 / $1.112 | [official](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/6ltgkz7is) |
-| ByteDance | Doubao-Seed-1.6 | 旗舰 / 多模态与推理 | CNY 0.8 | CNY 8 | $0.111 / $1.112 | [official](https://www.volcengine.com/docs/82379/1099320) |
-| ByteDance | Doubao Pro | 均衡 / 通用 | CNY 0.8 | CNY 2 | $0.111 / $0.278 | [official](https://www.volcengine.com/docs/82379/1099320) |
-| ByteDance | Doubao Lite | 轻量 / 高吞吐 | CNY 0.3 | CNY 0.6 | $0.042 / $0.083 | [official](https://www.volcengine.com/docs/82379/1099320) |
-| Cohere | Command A | 旗舰 / 企业 RAG | USD 2.5 | USD 10 | $2.5 / $10 | [official](https://docs.cohere.com/docs/pricing) |
-| Cohere | Command R+ | 高质量 RAG | USD 2.5 | USD 10 | $2.5 / $10 | [official](https://docs.cohere.com/docs/pricing) |
-| Cohere | Command R | 轻量 RAG | USD 0.15 | USD 0.6 | $0.15 / $0.6 | [official](https://docs.cohere.com/docs/pricing) |
-| DeepSeek | DeepSeek-V3 | 通用 / 代码 | CNY 2 | CNY 8 | $0.278 / $1.112 | [official](https://api-docs.deepseek.com/quick_start/pricing) |
-| DeepSeek | DeepSeek-R1 | 推理 | CNY 4 | CNY 16 | $0.556 / $2.224 | [official](https://api-docs.deepseek.com/quick_start/pricing) |
-| Google | Gemini 2.5 Pro | 旗舰 / 推理与多模态 | USD 1.25 | USD 10 | $1.25 / $10 | [official](https://ai.google.dev/gemini-api/docs/pricing) |
-| Google | Gemini 2.5 Flash | 均衡 / Agent | USD 0.3 | USD 2.5 | $0.3 / $2.5 | [official](https://ai.google.dev/gemini-api/docs/pricing) |
-| Google | Gemini 2.5 Flash-Lite | 轻量 / 高吞吐 | USD 0.1 | USD 0.4 | $0.1 / $0.4 | [official](https://ai.google.dev/gemini-api/docs/pricing) |
-| Meta | Llama 4 Maverick | 旗舰开源 / 多模态 (partner/self-hosted) | — | — | — | [official](https://www.llama.com/llama-downloads/) |
-| Meta | Llama 4 Scout | 长上下文开源 / 多模态 (partner/self-hosted) | — | — | — | [official](https://www.llama.com/llama-downloads/) |
-| MiniMax | MiniMax-M2.7 | 代码 / Agent | CNY 2.1 | CNY 8.4 | $0.292 / $1.168 | [official](https://platform.minimaxi.com/docs/guides/pricing-paygo) |
-| MiniMax | MiniMax-M2.7-highspeed | 低延迟 / 代码与 Agent | CNY 4.2 | CNY 16.8 | $0.584 / $2.335 | [official](https://platform.minimaxi.com/docs/guides/pricing-paygo) |
-| MiniMax | MiniMax-M2.5 | 均衡 / 代码与 Agent | CNY 2.1 | CNY 8.4 | $0.292 / $1.168 | [official](https://platform.minimaxi.com/docs/guides/pricing-paygo) |
-| Mistral AI | Mistral Large 3 | 旗舰 / 通用 | USD 0.5 | USD 1.5 | $0.5 / $1.5 | [official](https://docs.mistral.ai/platform/pricing/) |
-| Mistral AI | Mistral Medium 3 | 均衡 / 企业 | USD 0.4 | USD 2 | $0.4 / $2 | [official](https://docs.mistral.ai/platform/pricing/) |
-| Mistral AI | Mistral Small 3 | 轻量 / 高吞吐 | USD 0.1 | USD 0.3 | $0.1 / $0.3 | [official](https://docs.mistral.ai/platform/pricing/) |
-| Mistral AI | Codestral | 代码 | USD 0.3 | USD 0.9 | $0.3 / $0.9 | [official](https://docs.mistral.ai/platform/pricing/) |
-| Moonshot AI | Kimi K2 | 旗舰 / Agent 与代码 | CNY 4 | CNY 16 | $0.556 / $2.224 | [official](https://platform.moonshot.cn/docs/pricing) |
-| Moonshot AI | Kimi K2 Turbo | 低延迟 / Agent 与代码 | CNY 8 | CNY 32 | $1.112 / $4.448 | [official](https://platform.moonshot.cn/docs/pricing) |
-| OpenAI | GPT-5 | 旗舰 / 推理与通用 | USD 1.25 | USD 10 | $1.25 / $10 | [official](https://openai.com/api/pricing/) |
-| OpenAI | GPT-5 mini | 均衡 / 高性价比 | USD 0.25 | USD 2 | $0.25 / $2 | [official](https://openai.com/api/pricing/) |
-| OpenAI | GPT-5 nano | 轻量 / 高吞吐 | USD 0.05 | USD 0.4 | $0.05 / $0.4 | [official](https://openai.com/api/pricing/) |
-| OpenAI | o3 | 复杂推理 | USD 2 | USD 8 | $2 / $8 | [official](https://openai.com/api/pricing/) |
-| OpenAI | o4-mini | 经济型推理 | USD 1.1 | USD 4.4 | $1.1 / $4.4 | [official](https://openai.com/api/pricing/) |
-| OpenAI | GPT-4.1 | 通用 / 长上下文 | USD 2 | USD 8 | $2 / $8 | [official](https://openai.com/api/pricing/) |
-| StepFun | Step-3.5-Flash | 轻量 / 多模态 | CNY 0.5 | CNY 2 | $0.07 / $0.278 | [official](https://platform.stepfun.com/docs/zh/guides/pricing/intro) |
-| Tencent Cloud | Hunyuan TurboS | 高速 / 通用 | CNY 0.8 | CNY 2 | $0.111 / $0.278 | [official](https://cloud.tencent.com/document/product/1729/97732) |
-| Tencent Cloud | Hunyuan T1 | 深度推理 | CNY 4 | CNY 16 | $0.556 / $2.224 | [official](https://cloud.tencent.com/document/product/1729/97732) |
-| Zhipu AI | GLM-4.5 | 旗舰 / 推理与代码 | CNY 4 | CNY 16 | $0.556 / $2.224 | [official](https://docs.bigmodel.cn/cn/guide/models/text/glm-4.5) |
-| Zhipu AI | GLM-4.5 Air | 经济型 / 推理与代码 | CNY 0.8 | CNY 2 | $0.111 / $0.278 | [official](https://docs.bigmodel.cn/cn/guide/models/text/glm-4.5) |
-| xAI | Grok 4 | 旗舰 / 推理 | USD 3 | USD 15 | $3 / $15 | [official](https://docs.x.ai/docs/models) |
-| xAI | Grok 3 Mini | 经济型推理 | USD 0.3 | USD 0.5 | $0.3 / $0.5 | [official](https://docs.x.ai/docs/models) |
+| 模型 | 定位 | 上下文 | 默认输入 / 输出（USD / MTok） | 长上下文规则 | 官方来源 |
+|---|---|---:|---:|---|---|
+| GPT-5.6 Sol | 旗舰 / 最强 Agent 与复杂工作流 | 1,050,000 | $5 / $30 | 超过 272K 输入 Token 的长上下文请求使用更高档位；cache write 单列。 | [官方](https://developers.openai.com/api/docs/models/gpt-5.6-sol) |
+| GPT-5.6 Terra | 均衡 / 更低单价 | 1,050,000 | $2 / $12 | 超过 272K 输入 Token 的长上下文请求使用更高档位；cache write 单列。 | [官方](https://developers.openai.com/api/docs/models/gpt-5.6-terra) |
+| GPT-5.6 Luna | 高吞吐 / 最低单价 | 1,050,000 | $0.2 / $1.2 | 超过 272K 输入 Token 的长上下文请求使用更高档位；cache write 单列。 | [官方](https://developers.openai.com/api/docs/models/gpt-5.6-luna) |
 
-## Coding agents / indirect access
+## 原生模型 API（全量）
 
-These are product plans or credit systems, not native token list prices. An effective per-token price is only shown where the vendor explicitly publishes a fixed overage rate.
+| 厂商 | 模型 | 生命周期 | 定位 | 输入 / MTok | 输出 / MTok | 价格档位 | 来源 |
+|---|---|---|---|---:|---:|---|---|
+| Alibaba Cloud | Qwen Coder | active | 代码 | CNY 1.5 | CNY 6 | 标准 | [官方](https://help.aliyun.com/zh/model-studio/models) |
+| Alibaba Cloud | Qwen-Max | active | 旗舰 / 通用 | CNY 2.4 | CNY 9.6 | 标准 | [官方](https://help.aliyun.com/zh/model-studio/models) |
+| Alibaba Cloud | Qwen-Plus | active | 均衡 / 通用 | CNY 0.8 | CNY 2 | 标准 | [官方](https://help.aliyun.com/zh/model-studio/models) |
+| Alibaba Cloud | Qwen-Turbo | active | 轻量 / 高吞吐 | CNY 0.3 | CNY 0.6 | 标准 | [官方](https://help.aliyun.com/zh/model-studio/models) |
+| Anthropic | Claude Haiku 3.5 | active | 轻量 / 高吞吐 | USD 0.8 | USD 4 | 标准 | [官方](https://docs.anthropic.com/en/docs/about-claude/pricing) |
+| Anthropic | Claude Opus 4.1 | active | 旗舰 / 高难推理 | USD 15 | USD 75 | 标准 | [官方](https://docs.anthropic.com/en/docs/about-claude/pricing) |
+| Anthropic | Claude Sonnet 4 | active | 均衡 / 编码 | USD 3 | USD 15 | 标准 | [官方](https://docs.anthropic.com/en/docs/about-claude/pricing) |
+| Baidu | ERNIE 4.5 | active | 旗舰 / 通用 | CNY 4 | CNY 16 | 标准 | [官方](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/6ltgkz7is) |
+| Baidu | ERNIE X1 | active | 推理 | CNY 2 | CNY 8 | 标准 | [官方](https://cloud.baidu.com/doc/WENXINWORKSHOP/s/6ltgkz7is) |
+| ByteDance | Doubao Lite | active | 轻量 / 高吞吐 | CNY 0.3 | CNY 0.6 | 标准 | [官方](https://www.volcengine.com/docs/82379/1099320) |
+| ByteDance | Doubao Pro | active | 均衡 / 通用 | CNY 0.8 | CNY 2 | 标准 | [官方](https://www.volcengine.com/docs/82379/1099320) |
+| ByteDance | Doubao-Seed-1.6 | active | 旗舰 / 多模态与推理 | CNY 0.8 | CNY 8 | 标准 | [官方](https://www.volcengine.com/docs/82379/1099320) |
+| Cohere | Command A | active | 旗舰 / 企业 RAG | USD 2.5 | USD 10 | 标准 | [官方](https://docs.cohere.com/docs/how-does-cohere-pricing-work) |
+| Cohere | Command R | active | 轻量 RAG | USD 0.15 | USD 0.6 | 标准 | [官方](https://docs.cohere.com/docs/how-does-cohere-pricing-work) |
+| Cohere | Command R+ | active | 高质量 RAG | USD 2.5 | USD 10 | 标准 | [官方](https://docs.cohere.com/docs/how-does-cohere-pricing-work) |
+| DeepSeek | DeepSeek-R1 | active | 推理 | CNY 4 | CNY 16 | 标准 | [官方](https://api-docs.deepseek.com/quick_start/pricing) |
+| DeepSeek | DeepSeek-V3 | active | 通用 / 代码 | CNY 2 | CNY 8 | 标准 | [官方](https://api-docs.deepseek.com/quick_start/pricing) |
+| Google | Gemini 2.5 Flash | active | 均衡 / Agent | USD 0.3 | USD 2.5 | 标准 | [官方](https://ai.google.dev/gemini-api/docs/pricing) |
+| Google | Gemini 2.5 Flash-Lite | active | 轻量 / 高吞吐 | USD 0.1 | USD 0.4 | 标准 | [官方](https://ai.google.dev/gemini-api/docs/pricing) |
+| Google | Gemini 2.5 Pro | active | 旗舰 / 推理与多模态 | USD 1.25 | USD 10 | 标准 | [官方](https://ai.google.dev/gemini-api/docs/pricing) |
+| Meta | Llama 4 Maverick | — | 旗舰开源 / 多模态 (partner/self-hosted) | — | — | — | [官方](https://www.llama.com/llama-downloads/) |
+| Meta | Llama 4 Scout | — | 长上下文开源 / 多模态 (partner/self-hosted) | — | — | — | [官方](https://www.llama.com/llama-downloads/) |
+| MiniMax | MiniMax-M2.5 | active | 均衡 / 代码与 Agent | CNY 2.1 | CNY 8.4 | 标准 | [官方](https://platform.minimaxi.com/docs/guides/pricing-paygo) |
+| MiniMax | MiniMax-M2.7 | active | 代码 / Agent | CNY 2.1 | CNY 8.4 | 标准 | [官方](https://platform.minimaxi.com/docs/guides/pricing-paygo) |
+| MiniMax | MiniMax-M2.7-highspeed | active | 低延迟 / 代码与 Agent | CNY 4.2 | CNY 16.8 | 标准 | [官方](https://platform.minimaxi.com/docs/guides/pricing-paygo) |
+| Mistral AI | Codestral | active | 代码 | USD 0.3 | USD 0.9 | 标准 | [官方](https://mistral.ai/pricing/api/) |
+| Mistral AI | Mistral Large 3 | active | 旗舰 / 通用 | USD 0.5 | USD 1.5 | 标准 | [官方](https://mistral.ai/pricing/api/) |
+| Mistral AI | Mistral Medium 3 | active | 均衡 / 企业 | USD 0.4 | USD 2 | 标准 | [官方](https://mistral.ai/pricing/api/) |
+| Mistral AI | Mistral Small 3 | active | 轻量 / 高吞吐 | USD 0.1 | USD 0.3 | 标准 | [官方](https://mistral.ai/pricing/api/) |
+| Moonshot AI | Kimi K2 | active | 旗舰 / Agent 与代码 | CNY 4 | CNY 16 | 标准 | [官方](https://platform.moonshot.cn/docs/pricing) |
+| Moonshot AI | Kimi K2 Turbo | active | 低延迟 / Agent 与代码 | CNY 8 | CNY 32 | 标准 | [官方](https://platform.moonshot.cn/docs/pricing) |
+| OpenAI | GPT-4.1 | active | 通用 / 长上下文 | USD 2 | USD 8 | 标准 | [官方](https://openai.com/api/pricing/) |
+| OpenAI | GPT-5 | active | 旗舰 / 推理与通用 | USD 1.25 | USD 10 | 标准 | [官方](https://openai.com/api/pricing/) |
+| OpenAI | GPT-5 mini | active | 均衡 / 高性价比 | USD 0.25 | USD 2 | 标准 | [官方](https://openai.com/api/pricing/) |
+| OpenAI | GPT-5 nano | active | 轻量 / 高吞吐 | USD 0.05 | USD 0.4 | 标准 | [官方](https://openai.com/api/pricing/) |
+| OpenAI | GPT-5.6 Luna | active | 高吞吐 / 最低单价 | USD 0.2 | USD 1.2 | ≤272K input；>272K input | [官方](https://developers.openai.com/api/docs/models/gpt-5.6-luna) |
+| OpenAI | GPT-5.6 Sol | active | 旗舰 / 最强 Agent 与复杂工作流 | USD 5 | USD 30 | ≤272K input；>272K input | [官方](https://developers.openai.com/api/docs/models/gpt-5.6-sol) |
+| OpenAI | GPT-5.6 Terra | active | 均衡 / 更低单价 | USD 2 | USD 12 | ≤272K input；>272K input | [官方](https://developers.openai.com/api/docs/models/gpt-5.6-terra) |
+| OpenAI | o3 | active | 复杂推理 | USD 2 | USD 8 | 标准 | [官方](https://openai.com/api/pricing/) |
+| OpenAI | o4-mini | active | 经济型推理 | USD 1.1 | USD 4.4 | 标准 | [官方](https://openai.com/api/pricing/) |
+| StepFun | Step-3.5-Flash | active | 轻量 / 多模态 | CNY 0.5 | CNY 2 | 标准 | [官方](https://platform.stepfun.com/docs/zh/guides/pricing/intro) |
+| Tencent Cloud | Hunyuan T1 | active | 深度推理 | CNY 4 | CNY 16 | 标准 | [官方](https://cloud.tencent.com/document/product/1729/97732) |
+| Tencent Cloud | Hunyuan TurboS | active | 高速 / 通用 | CNY 0.8 | CNY 2 | 标准 | [官方](https://cloud.tencent.com/document/product/1729/97732) |
+| Zhipu AI | GLM-4.5 | active | 旗舰 / 推理与代码 | CNY 4 | CNY 16 | 标准 | [官方](https://docs.bigmodel.cn/cn/guide/models/text/glm-4.5) |
+| Zhipu AI | GLM-4.5 Air | active | 经济型 / 推理与代码 | CNY 0.8 | CNY 2 | 标准 | [官方](https://docs.bigmodel.cn/cn/guide/models/text/glm-4.5) |
+| xAI | Grok 3 Mini | active | 经济型推理 | USD 0.3 | USD 0.5 | 标准 | [官方](https://docs.x.ai/docs/models) |
+| xAI | Grok 4 | active | 旗舰 / 推理 | USD 3 | USD 15 | 标准 | [官方](https://docs.x.ai/docs/models) |
 
-| Product | Plan | Monthly list price | Usage unit | Model access | Source |
-|---|---|---:|---|---|---|
-| Cursor | Hobby | $0 | limited agent/model usage | selected frontier models | [official](https://www.cursor.com/pricing) |
-| Cursor | Pro | $20 | included usage + usage-based overage | frontier models selected by Cursor | [official](https://www.cursor.com/pricing) |
-| Cursor | Pro+ | $60 | larger included usage + usage-based overage | frontier models selected by Cursor | [official](https://www.cursor.com/pricing) |
-| Cursor | Ultra | $200 | largest included usage + usage-based overage | frontier models selected by Cursor | [official](https://www.cursor.com/pricing) |
-| Kiro | Free | $0 | monthly credits | Kiro-supported models | [official](https://kiro.dev/pricing/) |
-| Kiro | Pro | $20 | monthly credits; extra credits as published | Kiro-supported models | [official](https://kiro.dev/pricing/) |
-| Kiro | Pro+ | $40 | larger monthly credit allocation | Kiro-supported models | [official](https://kiro.dev/pricing/) |
-| Kiro | Power | $200 | largest monthly credit allocation | Kiro-supported models | [official](https://kiro.dev/pricing/) |
-| GitHub Copilot | Free | $0 | monthly premium-request allowance | included models + limited premium models | [official](https://github.com/features/copilot/plans) |
-| GitHub Copilot | Pro | $10 | monthly premium requests; extra premium requests | model multiplier depends on selected model | [official](https://github.com/features/copilot/plans) |
-| GitHub Copilot | Pro+ | $39 | larger premium-request allowance | model multiplier depends on selected model | [official](https://github.com/features/copilot/plans) |
-| Windsurf | Free | $0 | limited prompt/flow credits | Windsurf-supported models | [official](https://windsurf.com/pricing) |
-| Windsurf | Pro | $15 | included credits + usage-based top-up | Windsurf-supported models | [official](https://windsurf.com/pricing) |
-| Windsurf | Teams | $30 | per-seat credits + administration | Windsurf-supported models | [official](https://windsurf.com/pricing) |
-| Cline | Bring your own API key | $0 | passes through the selected provider bill | provider/model chosen by user | [official](https://docs.cline.bot/features/model-providers) |
-| Roo Code | Bring your own API key | $0 | passes through the selected provider bill | provider/model chosen by user | [official](https://docs.roocode.com/features/model-providers) |
+## Coding Agent 套餐与可用额度
 
-## Interpretation
+| 产品 | 套餐 | 月度标价 | 含量 | 超额标价 | 计费口径 | 官方来源 |
+|---|---|---:|---|---:|---|---|
+| Cursor | Hobby | $0 | 有限用量 | — | 官方未公布固定 Token 或 Credit 配额 | [官方](https://docs.cursor.com/account/pricing) |
+| Cursor | Pro | $20 | 20 USD Agent API usage | — | 另有 bonus usage；超额按用量计费 | [官方](https://docs.cursor.com/account/pricing) |
+| Cursor | Pro+ | $60 | 70 USD Agent API usage | — | 另有 bonus usage；超额按用量计费 | [官方](https://docs.cursor.com/account/pricing) |
+| Cursor | Ultra | $200 | 400 USD Agent API usage | — | 另有 bonus usage；超额按用量计费 | [官方](https://docs.cursor.com/account/pricing) |
+| Kiro | Free | $0 | 50 credits | $0.04 | 可购买额外 Credits | [官方](https://kiro.dev/pricing/) |
+| Kiro | Pro | $20 | 1000 credits | $0.04 | 可购买额外 Credits | [官方](https://kiro.dev/pricing/) |
+| Kiro | Pro+ | $40 | 2000 credits | $0.04 | 可购买额外 Credits | [官方](https://kiro.dev/pricing/) |
+| Kiro | Pro Max | $100 | 5000 credits | $0.04 | 可购买额外 Credits | [官方](https://kiro.dev/pricing/) |
+| Kiro | Power | $200 | 10000 credits | $0.04 | 可购买额外 Credits | [官方](https://kiro.dev/pricing/) |
+| GitHub Copilot | Free | $0 | 有限免费用量 | $0.01 | 无统一可比的公开 AI Credit 配额 | [官方](https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals) |
+| GitHub Copilot | Pro | $10 | 1500 AI credits | $0.01 | 1,000 base + 500 flex AI credits | [官方](https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals) |
+| GitHub Copilot | Pro+ | $39 | 7000 AI credits | $0.01 | 3,900 base + 3,100 flex AI credits | [官方](https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals) |
+| GitHub Copilot | Max | $100 | 20000 AI credits | $0.01 | 10,000 base + 10,000 flex AI credits | [官方](https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals) |
+| Windsurf | Free | $0 | 25 prompt credits | — | 免费额度 | [官方](https://docs.windsurf.com/windsurf/accounts/usage) |
+| Windsurf | Pro | $15 | 500 prompt credits | $0.04 | Top-up：$10 / 250 credits | [官方](https://docs.windsurf.com/windsurf/accounts/usage) |
+| Windsurf | Teams | $30 | 500 prompt credits / seat | $0.04 | Top-up：$40 / 1,000 credits | [官方](https://docs.windsurf.com/windsurf/accounts/usage) |
+| Windsurf | Enterprise | — | 1000 prompt credits / seat | — | 企业报价；额度以合同为准 | [官方](https://docs.windsurf.com/windsurf/accounts/usage) |
+| Cline | Bring your own API key | $0 | provider-billed | — | 无固定 Cline Credit 倍率 | [官方](https://docs.cline.bot/getting-started/authorizing-with-cline) |
+| Roo Code（已停止） | Bring your own API key（历史） | $0 | provider-billed | — | 产品已停止；无固定 Roo Code Credit 倍率 | [官方](https://roocodeinc.github.io/Roo-Code/) |
 
-- `MTok` means one million tokens. Input and output are charged separately; reasoning tokens are commonly billed as output tokens.
-- USD is the native list currency for global suppliers. CNY rows retain their source price and add a comparison-only USD conversion using the recorded `fx_usd_per_cny` snapshot; it is not a billing quote.
-- Cached-input prices apply only when the provider confirms a cache hit. Cache writes, image, audio, tool, batch, regional, and long-context pricing may be separate.
-- Hosted open-weight models are marked `partner/self-hosted`: there is no single Meta-native API list price to compare.
-- Coding-agent usage can include hidden context, retries, tool calls, and provider routing. Do not divide a subscription fee by visible chat tokens and label it an API price.
+## Agent × 模型消耗对比
+
+情景：**一次中等编码任务**（输入 0.15 MTok、缓存命中 0.05 MTok、输出 0.015 MTok；Credit 产品以 1 个基础任务为基准）。订阅内额度不在此扣除，估算仅用于比较单次消耗或超额成本。
+
+| Agent | 模型 | 计费方式 | 模型级消耗 / 该情景 | 可用性 | 来源 |
+|---|---|---|---|---|---|
+| Cline | 所选提供商模型（BYOK / Provider） | provider_token_price | 不可量化（无固定倍率） | selected-model-dependent | [官方](https://docs.cline.bot/getting-started/authorizing-with-cline) |
+| Cursor | Cursor Auto | agent_token_price | USD Agent API usage ≈ $0.2275 | active | [官方](https://docs.cursor.com/account/pricing) |
+| Cursor | GPT-5.6 Luna（如当前模型选择器可用） | native_api_price | 0.039 USD Agent API usage ≈ $0.039 | model-selection-dependent | [官方](https://docs.cursor.com/account/pricing) |
+| Cursor | GPT-5.6 Sol（如当前模型选择器可用） | native_api_price | 0.975 USD Agent API usage ≈ $0.975 | model-selection-dependent | [官方](https://docs.cursor.com/account/pricing) |
+| Cursor | GPT-5.6 Terra（如当前模型选择器可用） | native_api_price | 0.39 USD Agent API usage ≈ $0.39 | model-selection-dependent | [官方](https://docs.cursor.com/account/pricing) |
+| GitHub Copilot | GPT-5.6 Luna | agent_token_price | 3.9 GitHub AI credits ≈ $0.039 | active | [官方](https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing) |
+| GitHub Copilot | GPT-5.6 Sol | agent_token_price | 97.5 GitHub AI credits ≈ $0.975 | active | [官方](https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing) |
+| GitHub Copilot | GPT-5.6 Terra | agent_token_price | 39 GitHub AI credits ≈ $0.39 | active | [官方](https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing) |
+| Kiro | Claude Haiku 4.5 | credit_multiplier | 0.4 Kiro credits ≈ $0.016 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | Claude Opus 5 | credit_multiplier | 2.2 Kiro credits ≈ $0.088 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | Claude Sonnet 5 | credit_multiplier | 1.3 Kiro credits ≈ $0.052 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | DeepSeek V3.2 | credit_multiplier | 0.25 Kiro credits ≈ $0.01 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | GLM-5 | credit_multiplier | 0.5 Kiro credits ≈ $0.02 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | GPT-5.6 Luna | credit_multiplier | 0.6 Kiro credits ≈ $0.024 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | GPT-5.6 Sol | credit_multiplier | 2.4 Kiro credits ≈ $0.096 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | GPT-5.6 Terra | credit_multiplier | 1.2 Kiro credits ≈ $0.048 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | MiniMax M2.5 | credit_multiplier | 0.25 Kiro credits ≈ $0.01 | active | [官方](https://kiro.dev/docs/models) |
+| Kiro | Qwen3 Coder Next | credit_multiplier | 0.05 Kiro credits ≈ $0.002 | active | [官方](https://kiro.dev/docs/models) |
+| Roo Code（已停止） | 所选提供商模型（BYOK，历史） | provider_token_price | 不可量化（无固定倍率） | discontinued | [官方](https://roocodeinc.github.io/Roo-Code/) |
+| Windsurf | Claude Opus 4.6 | fixed_prompt_credit | 6 prompt credits ≈ $0.24 | active | [官方](https://docs.windsurf.com/windsurf/models) |
+| Windsurf | Claude Opus 4.7（low thinking） | fixed_prompt_credit | 20 prompt credits ≈ $0.8 | active | [官方](https://docs.windsurf.com/windsurf/models) |
+| Windsurf | Claude Opus 4.7（medium thinking） | fixed_prompt_credit | 40 prompt credits ≈ $1.6 | active | [官方](https://docs.windsurf.com/windsurf/models) |
+| Windsurf | SWE-1.6 | fixed_prompt_credit | 0 prompt credits ≈ $0 | active | [官方](https://docs.windsurf.com/windsurf/models) |
+
+## 解释与边界
+
+- `MTok` = 100 万 Token。原生 API 的输入、输出、缓存读取与缓存写入可分别计费；当前工作量情景不包含 cache write。
+- Cursor 的 selected-model 行是官方声明的 API list-price pass-through，不表示 GPT‑5.6 一定已出现在 Cursor 当日选择器中。
+- Kiro 的倍率作用于随任务复杂度变化的基础 Credits，因此不能诚实地换算成固定 Token 单价。
+- Copilot 当前以 `$0.01 / AI credit` 按 Token 价格折算。Copilot 旧 premium-request 口径不用于本表的模型级对比。
+- Windsurf 以每条用户 Prompt 的模型倍率计费，模型矩阵会动态变化；Cline 和 Roo Code 不发布固定平台 Credit 倍率，使用所选模型的提供商价格。
+- CNY 模型的 USD 列仅用于横向比较，不是结算报价。自托管/合作方托管模型没有唯一的原厂 API 价格。
