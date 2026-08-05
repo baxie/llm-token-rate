@@ -39,9 +39,11 @@ def main() -> int:
     parser.add_argument("--report", type=Path, default=ROOT / "docs" / "PRICEBOOK.md")
     args = parser.parse_args()
 
-    sender = os.environ["SMTP_USERNAME"]
-    recipient = os.environ["REPORT_RECIPIENT"]
-    password = os.environ["SMTP_PASSWORD"]
+    sender = os.environ["SMTP_USERNAME"].strip()
+    recipient = os.environ["REPORT_RECIPIENT"].strip()
+    # Google displays an App Password in groups for readability. Treat all
+    # Unicode whitespace as a separator so pasted groups cannot break SMTP AUTH.
+    password = "".join(os.environ["SMTP_PASSWORD"].split())
     server = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
     port = int(os.environ.get("SMTP_PORT", "465"))
     if not args.report.is_file():

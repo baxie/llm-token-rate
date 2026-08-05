@@ -29,3 +29,6 @@ class CatalogueTest(unittest.TestCase):
         self.assertEqual(message["To"], "recipient@gmail.com")
         self.assertEqual(message.get_content_type(), "multipart/mixed")
         self.assertIn("PRICEBOOK.md", message.as_string())
+
+    def test_app_password_whitespace_is_removed(self) -> None:
+        self.assertEqual("".join("abcd\u00a0efgh ijkl\tmnop".split()), "abcdefghijklmnop")
