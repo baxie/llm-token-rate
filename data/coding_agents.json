@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-08-05",
+  "products": [
+    {"name":"Cursor","source_url":"https://www.cursor.com/pricing","plans":[
+      {"name":"Hobby","monthly_usd":0,"usage_unit":"limited agent/model usage","model_access":"selected frontier models"},
+      {"name":"Pro","monthly_usd":20,"usage_unit":"included usage + usage-based overage","model_access":"frontier models selected by Cursor"},
+      {"name":"Pro+","monthly_usd":60,"usage_unit":"larger included usage + usage-based overage","model_access":"frontier models selected by Cursor"},
+      {"name":"Ultra","monthly_usd":200,"usage_unit":"largest included usage + usage-based overage","model_access":"frontier models selected by Cursor"}
+    ]},
+    {"name":"Kiro","source_url":"https://kiro.dev/pricing/","plans":[
+      {"name":"Free","monthly_usd":0,"usage_unit":"monthly credits","model_access":"Kiro-supported models"},
+      {"name":"Pro","monthly_usd":20,"usage_unit":"monthly credits; extra credits as published","model_access":"Kiro-supported models"},
+      {"name":"Pro+","monthly_usd":40,"usage_unit":"larger monthly credit allocation","model_access":"Kiro-supported models"},
+      {"name":"Power","monthly_usd":200,"usage_unit":"largest monthly credit allocation","model_access":"Kiro-supported models"}
+    ]},
+    {"name":"GitHub Copilot","source_url":"https://github.com/features/copilot/plans","plans":[
+      {"name":"Free","monthly_usd":0,"usage_unit":"monthly premium-request allowance","model_access":"included models + limited premium models"},
+      {"name":"Pro","monthly_usd":10,"usage_unit":"monthly premium requests; extra premium requests","model_access":"model multiplier depends on selected model"},
+      {"name":"Pro+","monthly_usd":39,"usage_unit":"larger premium-request allowance","model_access":"model multiplier depends on selected model"}
+    ]},
+    {"name":"Windsurf","source_url":"https://windsurf.com/pricing","plans":[
+      {"name":"Free","monthly_usd":0,"usage_unit":"limited prompt/flow credits","model_access":"Windsurf-supported models"},
+      {"name":"Pro","monthly_usd":15,"usage_unit":"included credits + usage-based top-up","model_access":"Windsurf-supported models"},
+      {"name":"Teams","monthly_usd":30,"usage_unit":"per-seat credits + administration","model_access":"Windsurf-supported models"}
+    ]},
+    {"name":"Cline","source_url":"https://docs.cline.bot/features/model-providers","plans":[
+      {"name":"Bring your own API key","monthly_usd":0,"usage_unit":"passes through the selected provider bill","model_access":"provider/model chosen by user"}
+    ]},
+    {"name":"Roo Code","source_url":"https://docs.roocode.com/features/model-providers","plans":[
+      {"name":"Bring your own API key","monthly_usd":0,"usage_unit":"passes through the selected provider bill","model_access":"provider/model chosen by user"}
+    ]}
+  ]
+}
