@@ -4,12 +4,12 @@ An auditable catalogue for comparing native LLM API list prices with the very di
 
 ## What it covers
 
-- Native APIs: flagship, balanced, lightweight, reasoning, code, RAG, long-context, and open-weight/partner-hosted model categories across global and Chinese providers. The current snapshot includes OpenAI GPT-5.6 Sol, Terra, and Luna, including their long-context tiers and cache-write rates.
-- Coding agents: Cursor, Kiro, GitHub Copilot, Windsurf, Cline, and Roo Code. Subscription, credit, and BYOK pricing is intentionally kept separate from native token rates.
+- Native APIs: current flagship, balanced, lightweight, reasoning, code, RAG, long-context, and open-weight/partner-hosted model categories across global and Chinese providers. The current snapshot includes OpenAI GPT-5.6, Anthropic Claude Opus 4.8 / Sonnet 5 / Fable 5, Gemini 3, DeepSeek V4, Kimi K3, GLM-5.2, Doubao 2.0, and other active families.
+- Coding agents: Cursor, Kiro, GitHub Copilot, Windsurf, and Cline. Subscription, credit, and BYOK pricing is intentionally kept separate from native token rates.
 - Agent × model usage: `data/agent_model_rates.json` records public model-specific rules — pass-through API price, Token-to-Credit conversion, or a vendor Credit multiplier — plus items that cannot honestly be converted to a fixed amount.
 - Traceability: every row has an official pricing-page URL and the workflow records a SHA-256 fingerprint of each source page.
 
-`data/prices.json`, `data/coding_agents.json`, and `data/agent_model_rates.json` are the machine-readable source of truth. They preserve the original billing currency and an USD comparison field. CNY-to-USD figures are indicative snapshot conversions only; invoices are charged in the source currency.
+`data/prices.json`, `data/coding_agents.json`, and `data/agent_model_rates.json` are the machine-readable source of truth. The catalogue is an **active-only whitelist**: retired, sunset, or historical models and products must be removed rather than shown with a legacy label. They preserve the original billing currency and an USD comparison field. CNY-to-USD figures are indicative snapshot conversions only; invoices are charged in the source currency.
 
 ## Quick start
 
@@ -19,7 +19,7 @@ Requires only Python 3.11+.
 PYTHONPATH=src python3 -m llm_price_tracker.cli validate
 PYTHONPATH=src python3 -m llm_price_tracker.cli build
 PYTHONPATH=src python3 -m llm_price_tracker.cli estimate \
-  --model anthropic-claude-sonnet-4 --input-mtok 2 --output-mtok 0.5
+  --model anthropic-claude-sonnet-5 --input-mtok 2 --output-mtok 0.5
 ```
 
 The rendered comparison is in [docs/PRICEBOOK.html](docs/PRICEBOOK.html); [docs/PRICEBOOK.md](docs/PRICEBOOK.md) remains as a GitHub-friendly text version.
@@ -28,7 +28,7 @@ The rendered comparison is in [docs/PRICEBOOK.html](docs/PRICEBOOK.html); [docs/
 
 - Native model rows are public on-demand list prices per one million tokens (MTok), not discounts, enterprise contracts, batch rates, or regional offers unless stated. A model may declare `pricing_tiers` when long-context calls use a different rate.
 - A coding agent can add hidden context, retries, tool calls, model multipliers, and policy-based routing. Its subscription or credit cost must not be presented as a token API price. The report's model-level scenario is an overage/usage comparison; it does not deduct included monthly quotas.
-- For Cline and Roo Code in BYOK mode, the agent layer is $0 and the selected provider bill is the applicable native API cost.
+- For Cline in BYOK mode, the agent layer is $0 and the selected provider bill is the applicable native API cost.
 - Open-weight Llama models are available through partner APIs or self-hosting, so Meta has no single native API price to normalize.
 
 ## Scheduled verification

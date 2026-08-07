@@ -73,8 +73,14 @@ class CatalogueTest(unittest.TestCase):
         output = build_markdown(self.catalogue, self.agents, self.rates)
         self.assertIn("## 原生模型 API（全量）", output)
         self.assertIn("## Agent × 模型消耗对比", output)
-        self.assertIn("GPT-5.6 Sol", output)
+        self.assertIn("Claude Fable 5", output)
         self.assertIn("Kiro", output)
+        self.assertNotIn("Roo Code", output)
+
+    def test_only_active_models_and_products_are_reported(self) -> None:
+        self.assertTrue(all(model["status"] == "active" for model in self.catalogue["models"]))
+        self.assertTrue(all(product["status"] == "active" for product in self.agents["products"]))
+        self.assertNotIn("deepseek-v3", {model["id"] for model in self.catalogue["models"]})
 
     def test_html_render_includes_tables_and_sources(self) -> None:
         output = build_html(self.catalogue, self.agents, self.rates)

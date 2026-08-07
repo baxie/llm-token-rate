@@ -1,10 +1,11 @@
 {
-  "schema_version": 2,
-  "snapshot_date": "2026-08-05",
+  "schema_version": 3,
+  "snapshot_date": "2026-08-07",
   "products": [
     {
       "id": "cursor",
       "name": "Cursor",
+      "status": "active",
       "source_url": "https://docs.cursor.com/account/pricing",
       "billing_model": "订阅含美元 Agent API 用量；选定模型按其 API 标价消耗用量",
       "plans": [
@@ -17,6 +18,7 @@
     {
       "id": "kiro",
       "name": "Kiro",
+      "status": "active",
       "source_url": "https://kiro.dev/pricing/",
       "billing_model": "任务按模型倍率消耗 Kiro Credits；基础 Credits 随任务复杂度而变",
       "plans": [
@@ -30,6 +32,7 @@
     {
       "id": "github-copilot",
       "name": "GitHub Copilot",
+      "status": "active",
       "source_url": "https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals",
       "billing_model": "AI Credits（$0.01 / credit）按所选模型的 Token 价折算；旧 premium request 制度另列历史说明",
       "plans": [
@@ -42,6 +45,7 @@
     {
       "id": "windsurf",
       "name": "Windsurf",
+      "status": "active",
       "source_url": "https://docs.windsurf.com/windsurf/accounts/usage",
       "billing_model": "每条用户 Prompt 按模型倍率消耗 prompt credits，不等同于 Token 计费",
       "plans": [
@@ -54,19 +58,11 @@
     {
       "id": "cline",
       "name": "Cline",
+      "status": "active",
       "source_url": "https://docs.cline.bot/getting-started/authorizing-with-cline",
       "billing_model": "BYOK 或 Cline Provider 余额；Token 成本依所选提供商/模型传导",
       "plans": [
         {"name": "Bring your own API key", "monthly_usd": 0, "included_amount": null, "included_unit": "provider-billed", "overage_usd_per_unit": null, "model_access": "用户选择的提供商 / 模型", "billing_note": "无固定 Cline Credit 倍率"}
-      ]
-    },
-    {
-      "id": "roo-code",
-      "name": "Roo Code（已停止）",
-      "source_url": "https://roocodeinc.github.io/Roo-Code/",
-      "billing_model": "历史 BYOK 口径；官方文档称扩展已于 2026-05-15 停止",
-      "plans": [
-        {"name": "Bring your own API key（历史）", "monthly_usd": 0, "included_amount": null, "included_unit": "provider-billed", "overage_usd_per_unit": null, "model_access": "用户选择的提供商 / 模型", "billing_note": "产品已停止；无固定 Roo Code Credit 倍率"}
       ]
     }
   ],

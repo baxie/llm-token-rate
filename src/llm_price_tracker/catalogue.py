@@ -64,6 +64,11 @@ def model_index(catalogue: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {model["id"]: model for model in catalogue["models"]}
 
 
+def active_models(catalogue: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return the reportable model set; retired records never reach a report."""
+    return [model for model in catalogue["models"] if model.get("status") == "active"]
+
+
 def product_index(agents: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {product["id"]: product for product in agents["products"]}
 
@@ -155,7 +160,7 @@ def estimate_agent_rate(
 
 def validate_catalogue(catalogue: dict[str, Any]) -> list[str]:
     errors: list[str] = []
-    required = {"id", "provider", "model", "segment", "availability", "source_id"}
+    required = {"id", "provider", "model", "segment", "availability", "status", "last_verified_at", "source_id"}
     sources = {source["id"] for source in catalogue["sources"]}
     seen: set[str] = set()
     for item in catalogue["models"]:
@@ -167,6 +172,8 @@ def validate_catalogue(catalogue: dict[str, Any]) -> list[str]:
         seen.add(item.get("id"))
         if item.get("source_id") not in sources:
             errors.append(f"{item.get('id')}: unknown source_id")
+        if item.get("status") != "active":
+            errors.append(f"{item.get('id')}: catalogue only accepts active models")
         if item.get("availability") == "api" and not item.get("prices"):
             errors.append(f"{item.get('id')}: API model must have prices")
         for key, price in item.get("prices", {}).items():
@@ -184,6 +191,12 @@ def validate_catalogue(catalogue: dict[str, Any]) -> list[str]:
                 if previous_maximum is not None and maximum <= previous_maximum:
                     errors.append(f"{item.get('id')}: pricing tiers must be ascending")
                 previous_maximum = maximum
+    for model_id in catalogue.get("featured_model_ids", []):
+        model = model_index(catalogue).get(model_id)
+        if model is None:
+            errors.append(f"featured model does not exist: {model_id}")
+        elif model.get("status") != "active":
+            errors.append(f"featured model is not active: {model_id}")
     return errors
 
 
@@ -191,11 +204,13 @@ def validate_agent_data(catalogue: dict[str, Any], agents: dict[str, Any], rates
     errors: list[str] = []
     product_ids: set[str] = set()
     for product in agents.get("products", []):
-        if {"id", "name", "source_url", "billing_model", "plans"} - product.keys():
+        if {"id", "name", "source_url", "billing_model", "status", "plans"} - product.keys():
             errors.append(f"agent product {product.get('name', '<unknown>')}: missing required fields")
         if product.get("id") in product_ids:
             errors.append(f"duplicate agent product id: {product['id']}")
         product_ids.add(product.get("id"))
+        if product.get("status") != "active":
+            errors.append(f"agent product {product.get('id')}: catalogue only accepts active products")
         for plan in product.get("plans", []):
             for key in ("name", "monthly_usd", "included_amount", "included_unit", "model_access", "billing_note"):
                 if key not in plan:
@@ -221,6 +236,8 @@ def validate_agent_data(catalogue: dict[str, Any], agents: dict[str, Any], rates
             errors.append(f"{rate.get('id')}: unknown source_id")
         if rate.get("billing_mode") not in permitted_modes:
             errors.append(f"{rate.get('id')}: unsupported billing_mode")
+        if rate.get("availability") == "discontinued":
+            errors.append(f"{rate.get('id')}: discontinued model rates are not permitted")
         if rate.get("model_id") and rate["model_id"] not in known_models:
             errors.append(f"{rate.get('id')}: unknown model_id")
         if rate.get("billing_mode") == "native_api_price" and not rate.get("model_id"):
@@ -234,9 +251,28 @@ def validate_agent_data(catalogue: dict[str, Any], agents: dict[str, Any], rates
 
 
 def pricing_label(item: dict[str, Any]) -> str:
+    if item.get("billing_status") == "limited-free":
+        return "限额免费"
     if not item.get("pricing_tiers"):
         return "标准"
     return "；".join(tier["label"] for tier in item["pricing_tiers"])
+
+
+def price_pair(item: dict[str, Any]) -> str:
+    prices = item.get("prices")
+    if not prices:
+        return "—"
+    return f"{usd(prices['input_usd_per_mtok'])} / {usd(prices['output_usd_per_mtok'])}"
+
+
+def context_window_label(item: dict[str, Any]) -> str:
+    context_window = item.get("context_window_tokens")
+    return f"{context_window:,}" if isinstance(context_window, int) else "—"
+
+
+def lifecycle_label(item: dict[str, Any]) -> str:
+    stage = item.get("release_stage")
+    return f"{item['status']} / {stage}" if stage else item["status"]
 
 
 def source_markdown(source: dict[str, Any]) -> str:
@@ -262,18 +298,18 @@ def build_markdown(catalogue: dict[str, Any], agents: dict[str, Any], rates: dic
         "",
         f"> Snapshot: `{catalogue['snapshot_date']}`. Official list prices and public agent billing rules only; check the linked source before purchase.",
         "",
-        "## 本次重点：OpenAI GPT‑5.6 系列",
+        "## 当前活跃模型速览",
         "",
-        "| 模型 | 定位 | 上下文 | 默认输入 / 输出（USD / MTok） | 长上下文规则 | 官方来源 |",
+        "| 厂商 · 模型 | 定位 | 上下文 | 默认输入 / 输出（USD / MTok） | 长上下文规则 | 官方来源 |",
         "|---|---|---:|---:|---|---|",
     ]
-    latest = set(catalogue.get("latest_model_ids", []))
-    for item in catalogue["models"]:
-        if item["id"] not in latest:
+    featured = set(catalogue.get("featured_model_ids", []))
+    for item in active_models(catalogue):
+        if item["id"] not in featured:
             continue
         lines.append(
-            f"| {item['model']} | {item['segment']} | {item.get('context_window_tokens', '—'):,} | "
-            f"{usd(item['prices']['input_usd_per_mtok'])} / {usd(item['prices']['output_usd_per_mtok'])} | "
+            f"| {item['provider']} · {item['model']} | {item['segment']} | {context_window_label(item)} | "
+            f"{price_pair(item)} | "
             f"{item.get('pricing_note', '—')} | {source_markdown(sources[item['source_id']])} |"
         )
     lines.extend([
@@ -283,13 +319,13 @@ def build_markdown(catalogue: dict[str, Any], agents: dict[str, Any], rates: dic
         "| 厂商 | 模型 | 生命周期 | 定位 | 输入 / MTok | 输出 / MTok | 价格档位 | 来源 |",
         "|---|---|---|---|---:|---:|---|---|",
     ])
-    for item in sorted(catalogue["models"], key=lambda row: (row["provider"], row["model"])):
+    for item in sorted(active_models(catalogue), key=lambda row: (row["provider"], row["model"])):
         source = sources[item["source_id"]]
         if item["availability"] != "api":
-            lines.append(f"| {item['provider']} | {item['model']} | {item.get('status', '—')} | {item['segment']} ({item['availability']}) | — | — | — | {source_markdown(source)} |")
+            lines.append(f"| {item['provider']} | {item['model']} | {lifecycle_label(item)} | {item['segment']} ({item['availability']}) | — | — | — | {source_markdown(source)} |")
             continue
         lines.append(
-            f"| {item['provider']} | {item['model']} | {item.get('status', 'active')} | {item['segment']} | "
+            f"| {item['provider']} | {item['model']} | {lifecycle_label(item)} | {item['segment']} | "
             f"{native_price(item, 'input')} | {native_price(item, 'output')} | {pricing_label(item)} | {source_markdown(source)} |"
         )
     lines.extend([
@@ -329,7 +365,8 @@ def build_markdown(catalogue: dict[str, Any], agents: dict[str, Any], rates: dic
         "- Cursor 的 selected-model 行是官方声明的 API list-price pass-through，不表示 GPT‑5.6 一定已出现在 Cursor 当日选择器中。",
         "- Kiro 的倍率作用于随任务复杂度变化的基础 Credits，因此不能诚实地换算成固定 Token 单价。",
         "- Copilot 当前以 `$0.01 / AI credit` 按 Token 价格折算。Copilot 旧 premium-request 口径不用于本表的模型级对比。",
-        "- Windsurf 以每条用户 Prompt 的模型倍率计费，模型矩阵会动态变化；Cline 和 Roo Code 不发布固定平台 Credit 倍率，使用所选模型的提供商价格。",
+        "- Windsurf 以每条用户 Prompt 的模型倍率计费，模型矩阵会动态变化；Cline 不发布固定平台 Credit 倍率，使用所选模型的提供商价格。",
+        "- 本报告实行活跃白名单：已下线、迁移或仅历史可用的模型与 Agent 产品不保留为报告条目。Preview 仍在官方 API 中可用，因此会标注为 Preview 而不与下线混淆。",
         "- CNY 模型的 USD 列仅用于横向比较，不是结算报价。自托管/合作方托管模型没有唯一的原厂 API 价格。",
     ])
     return "\n".join(lines) + "\n"
@@ -348,19 +385,19 @@ def build_html(catalogue: dict[str, Any], agents: dict[str, Any], rates: dict[st
         return "".join(f"<td>{escape(str(value))}</td>" for value in values)
 
     latest_rows = []
-    for item in catalogue["models"]:
-        if item["id"] in set(catalogue.get("latest_model_ids", [])):
+    for item in active_models(catalogue):
+        if item["id"] in set(catalogue.get("featured_model_ids", [])):
             latest_rows.append("<tr>" + cells([
-                item["model"], item["segment"], f"{item.get('context_window_tokens', 0):,}",
-                f"{usd(item['prices']['input_usd_per_mtok'])} / {usd(item['prices']['output_usd_per_mtok'])}", item.get("pricing_note", "—"),
+                f"{item['provider']} · {item['model']}", item["segment"], context_window_label(item),
+                price_pair(item), item.get("pricing_note", "—"),
             ]) + f"<td>{link(sources[item['source_id']])}</td></tr>")
 
     native_rows = []
-    for item in sorted(catalogue["models"], key=lambda row: (row["provider"], row["model"])):
+    for item in sorted(active_models(catalogue), key=lambda row: (row["provider"], row["model"])):
         if item["availability"] != "api":
-            row = [item["provider"], item["model"], item.get("status", "—"), f"{item['segment']} ({item['availability']})", "—", "—", "—"]
+            row = [item["provider"], item["model"], lifecycle_label(item), f"{item['segment']} ({item['availability']})", "—", "—", "—"]
         else:
-            row = [item["provider"], item["model"], item.get("status", "active"), item["segment"], native_price(item, "input"), native_price(item, "output"), pricing_label(item)]
+            row = [item["provider"], item["model"], lifecycle_label(item), item["segment"], native_price(item, "input"), native_price(item, "output"), pricing_label(item)]
         native_rows.append("<tr>" + cells(row) + f"<td>{link(sources[item['source_id']])}</td></tr>")
 
     plan_rows = []
@@ -396,13 +433,13 @@ def build_html(catalogue: dict[str, Any], agents: dict[str, Any], rates: dict[st
 </head>
 <body><main>
   <header><h1>LLM Price Catalogue</h1><p>快照日期：{escape(catalogue['snapshot_date'])} · 原生模型价格、Agent 套餐与模型级 Credit / 用量对比</p></header>
-  <section class="summary"><div class="card"><strong>{len(catalogue['models'])}</strong>覆盖模型</div><div class="card"><strong>{len(agents['products'])}</strong>编程 Agent</div><div class="card"><strong>{len(rates['rates'])}</strong>模型级 Agent 规则</div><div class="card"><strong>官方页面</strong>每日变更检测</div></section>
-  <h2>本次重点：OpenAI GPT‑5.6 系列</h2><p>Sol 为最强 Agent / 工作流档，Terra 为均衡档，Luna 为高吞吐档。长上下文档位与缓存写入费用已单列。</p>
-  <div class="table-wrap"><table><thead><tr><th>模型</th><th>定位</th><th>上下文 Tokens</th><th>默认输入 / 输出（USD / MTok）</th><th>长上下文规则</th><th>来源</th></tr></thead><tbody>{''.join(latest_rows)}</tbody></table></div>
+  <section class="summary"><div class="card"><strong>{len(active_models(catalogue))}</strong>活跃模型</div><div class="card"><strong>{len(agents['products'])}</strong>编程 Agent</div><div class="card"><strong>{len(rates['rates'])}</strong>模型级 Agent 规则</div><div class="card"><strong>官方页面</strong>每日变更检测</div></section>
+  <h2>当前活跃模型速览</h2><p>每家厂商的当前主力模型均纳入速览；完整表同时涵盖旗舰、均衡、轻量、代码、推理和多模态定位。Preview 会明确标注，已下线型号不会出现。</p>
+  <div class="table-wrap"><table><thead><tr><th>厂商 · 模型</th><th>定位</th><th>上下文 Tokens</th><th>默认输入 / 输出（USD / MTok）</th><th>长上下文规则</th><th>来源</th></tr></thead><tbody>{''.join(latest_rows)}</tbody></table></div>
   <h2>原生模型 API（全量）</h2><div class="table-wrap"><table><thead><tr><th>厂商</th><th>模型</th><th>生命周期</th><th>定位</th><th>原币输入 / MTok</th><th>原币输出 / MTok</th><th>价格档位</th><th>来源</th></tr></thead><tbody>{''.join(native_rows)}</tbody></table></div>
   <h2>Coding Agent 套餐与可用额度</h2><p>订阅费与模型级消耗分开呈现；含量可抵扣的单位由产品自行定义，不能直接当作 Token。</p><div class="table-wrap"><table><thead><tr><th>产品</th><th>套餐</th><th>月度标价</th><th>含量</th><th>超额标价</th><th>计费口径</th><th>来源</th></tr></thead><tbody>{''.join(plan_rows)}</tbody></table></div>
   <h2>Agent × 模型消耗对比</h2><p>情景：{escape(medium['label'])}（输入 {medium['input_mtok']} MTok、缓存命中 {medium['cached_input_mtok']} MTok、输出 {medium['output_mtok']} MTok；Credit 产品以 1 个基础任务为基准）。估算不包含订阅内额度。</p><div class="table-wrap"><table><thead><tr><th>Agent</th><th>模型</th><th>计费方式</th><th>模型级消耗 / 该情景</th><th>可用性</th><th>口径</th><th>来源</th></tr></thead><tbody>{''.join(rate_rows)}</tbody></table></div>
-  <h2>解释与边界</h2><div class="note">MTok = 100 万 Token。Cursor 的 selected-model 口径是 API list-price pass-through，是否可选须以其当日模型选择器为准。Kiro 的 Credit 倍率作用于随任务复杂度变化的基础 Credits；Windsurf 以每条用户 Prompt 的模型倍率计费；Cline 与 Roo Code 没有公开的固定平台倍率。Copilot 的模型级用量为 $0.01 / AI Credit 的 Token 价折算。</div>
+  <h2>解释与边界</h2><div class="note">MTok = 100 万 Token。Cursor 的 selected-model 口径是 API list-price pass-through，是否可选须以其当日模型选择器为准。Kiro 的 Credit 倍率作用于随任务复杂度变化的基础 Credits；Windsurf 以每条用户 Prompt 的模型倍率计费；Cline 没有公开的固定平台倍率。Copilot 的模型级用量为 $0.01 / AI Credit 的 Token 价折算。已停止的模型与产品不在本报告保留。</div>
 </main></body></html>\n"""
 
 
