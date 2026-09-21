@@ -1,12 +1,11 @@
 {
-  "checked_at": "2026-08-07T06:51:54+00:00",
+  "checked_at": "2026-09-21T07:55:57+00:00",
   "sources": [
     {
       "id": "openai-gpt-5.6-sol",
       "url": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
       "http_status": 200,
-      "content_sha256": "6fea75a1d36090b92700a0824eed33e56c639a6cd54aae3222106afb8ac9ddd0",
-      "fetch_method": "curl-fallback",
+      "content_sha256": "0918bac2716d2185ae6f05eceb97ae04c9e6fad8aa89e23dbd70d8bcf516642e",
       "model_candidates": [
         "GPT-5.6 Sol"
       ],
@@ -16,8 +15,7 @@
       "id": "openai-gpt-5.6-terra",
       "url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
       "http_status": 200,
-      "content_sha256": "2b53579bd22a620ac25713766b8d0d765c09cff4236a119679db513145a49338",
-      "fetch_method": "curl-fallback",
+      "content_sha256": "1f4cfb1a9675cea94799d19497340d74d488dc0179969383b0d04acf7f99fcc5",
       "model_candidates": [
         "GPT-5.6 Sol",
         "GPT-5.6 Terra"
@@ -28,8 +26,7 @@
       "id": "openai-gpt-5.6-luna",
       "url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
       "http_status": 200,
-      "content_sha256": "b6ddc020e4b6377f677e4f30e54a59118ce42ba99f419bf0053db5bf349bb371",
-      "fetch_method": "curl-fallback",
+      "content_sha256": "359b532c1cb01ab5fca93adadcd2a288ef8a9a091c3938f5dd20e3efe259f431",
       "model_candidates": [
         "GPT-5.6 Luna",
         "GPT-5.6 Terra"
@@ -40,234 +37,203 @@
       "id": "anthropic-opus-4.8",
       "url": "https://www.anthropic.com/claude/opus?app=claude-code",
       "http_status": 200,
-      "content_sha256": "9de8e1ea2eabd246888fe807d13564e1ffb91bb1ff6754bd2e5d4bfb6a8effe9",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "2552da310f7c29540b8bcbb05fd4e6d2d69062ee45153c9ad8689c105cfeb273",
+      "changed": true
     },
     {
       "id": "anthropic-sonnet-5",
       "url": "https://www.anthropic.com/claude/sonnet?hsLang=en-us",
       "http_status": 200,
-      "content_sha256": "3b0073f9836d7dd1e0f4a6034c702ff8d6e2b963f28295865660dda1cea42275",
-      "fetch_method": "curl-fallback",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "39160f68d2a9a583e628ecb46fcdb9c2da212fa7f861b4628897186ef6239089",
+      "changed": true
     },
     {
       "id": "anthropic-fable-5",
       "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5?type=company",
       "http_status": 200,
-      "content_sha256": "31d50358214d609e0d2a58265a2f7c9318acd76db5620d3bdc34c35943590b6b",
-      "fetch_method": "curl-fallback",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "8fa894d964b30395b1eb4a16895429415707335f3c3fe74c759062a4eb1e7eda",
+      "changed": true
     },
     {
       "id": "anthropic-pricing",
       "url": "https://docs.anthropic.com/en/docs/about-claude/pricing",
       "http_status": 200,
-      "content_sha256": "fbb48b5bc99b1cf5ad056547edcc2d49e0e1ab72c7ee322cdd96996ba6f9f4bf",
-      "fetch_method": "curl-fallback",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "6dc09ce951f56b516362ea914abb7ae28fbdc772224b1b6da11a4ac562dbf385",
+      "changed": true
     },
     {
       "id": "google-gemini-3",
       "url": "https://ai.google.dev/gemini-api/docs/gemini-3",
       "http_status": 200,
-      "content_sha256": "04611c792406c2c37b24d8df9a10b54e5077b82bbd2bce43e0feb93ae21bf580",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "56f4b074c0a8b19a815c1b8042c1b8a31c9379b9ba69f8ed6d430144a69a71c6",
+      "changed": true
     },
     {
       "id": "xai-pricing",
       "url": "https://docs.x.ai/developers/pricing",
       "http_status": 200,
-      "content_sha256": "99b891a4411f84f185cc096fda0aae58d7186ab8e43a9cf76519abab826d5256",
-      "fetch_method": "curl-fallback",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "d4eae84dac6ae1b8abff8732674f15edd73eb58b05bedb9d2f991192256ef667",
+      "changed": true
     },
     {
       "id": "mistral-pricing",
       "url": "https://mistral.ai/pricing/api/",
-      "http_status": 206,
-      "content_sha256": "3a51d393d93d0957d97aefc4ca5a20d89000d7e2299bc12008f1e6b2e0c50a09",
-      "fetch_method": "curl-fallback",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "http_status": 200,
+      "content_sha256": "d4a8251032cdf951f372b5de9fc3568b5e88a704f7dd0ad3037c841854a317a5",
+      "changed": true
     },
     {
       "id": "cohere-command-a-plus",
       "url": "https://docs.cohere.com/docs/command-a-plus",
       "http_status": 200,
-      "content_sha256": "ac28a64752bfe6623df6ec791e1eb5269133de60c24deecab00577d5cc340cef",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "9ced2fc022ce36f38d8dee6a86b7325895e85cce010ff3a1c0a75a85a034a8de",
+      "changed": true
     },
     {
       "id": "cohere-command-a",
       "url": "https://docs.cohere.com/docs/command-a",
       "http_status": 200,
-      "content_sha256": "2ce9365a1da14911b1faab0512f150e7ecd428339d83d39cb57d656aafe1a72b",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "25ab29b5a78823f59bd8d65d907e2ed531b6d05ba0c40996b1ce9adecb123c8e",
+      "changed": true
     },
     {
       "id": "meta-llama",
       "url": "https://www.llama.com/llama-downloads/",
       "http_status": 200,
-      "content_sha256": "c243da22c5ec3e793b6572168d84294a469375ab4f0d96eeb009cbfe60ae6608",
-      "fetch_method": "curl-fallback",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "9133a516e8a3efe1fca0a0e4311f125c7e3b59f3756be1eefcf3e05d2cb5efcf",
+      "changed": true
     },
     {
       "id": "deepseek-pricing",
       "url": "https://api-docs.deepseek.com/quick_start/pricing",
       "http_status": 200,
-      "content_sha256": "44aa75e362a4be4ee1136c5f45938a0e7dd3a4fb11e55f88cb662b5759de5ae0",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "2fecee48bf6ad791bce38d1d5504d8ad5c8b0fd4da93e6dc198ae88ff1a4506a",
+      "changed": true
     },
     {
       "id": "qwen-pricing",
       "url": "https://help.aliyun.com/en/model-studio/model-pricing",
       "http_status": 200,
-      "content_sha256": "48c3abb92821a920606d531a8536d17e33802372f6e7d16601910731b4da26e5",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "addd03c7a8ba562eb451f8856c37070952b3cffbe5e6e6273e31a80701bad352",
+      "changed": true
     },
     {
       "id": "moonshot-k3",
       "url": "https://platform.kimi.com/docs/pricing/chat-k3",
       "http_status": 200,
-      "content_sha256": "66d135f7fad80b914f88627c569a2316d9bdf14f55b40f7bb73ae00b6c17c3ca",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "17e10d95623016c596c9e20a0082be08ae21e5b3e0e110eed7b0808f9779fb25",
+      "changed": true
     },
     {
       "id": "moonshot-k27-code",
       "url": "https://platform.kimi.com/docs/pricing/chat-k27-code",
       "http_status": 200,
-      "content_sha256": "86a6813bac36c77e32e30862bc42721b485f137e5b8c50e76fb82d994c5dca9a",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "17e10d95623016c596c9e20a0082be08ae21e5b3e0e110eed7b0808f9779fb25",
+      "changed": true
     },
     {
       "id": "moonshot-k26",
       "url": "https://platform.kimi.com/docs/pricing/chat-k26",
       "http_status": 200,
-      "content_sha256": "d62788ceb44e90cfe0c7c566b3d7221cb872cd3de8bd334e7bfcd535a5d47aee",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "17e10d95623016c596c9e20a0082be08ae21e5b3e0e110eed7b0808f9779fb25",
+      "changed": true
     },
     {
       "id": "zhipu-pricing",
       "url": "https://bigmodel.cn/pricing",
       "http_status": 200,
-      "content_sha256": "aabb6ee4d50b4cff92923e04295e64af5996e11dafc56fbafec2e39a48551c4f",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "13456891d5a7a340b848a64d36d1b2fa9f15cd1abc0d6bd547dabb80cc4e7124",
+      "changed": true
     },
     {
       "id": "baidu-pricing",
       "url": "https://cloud.baidu.com/doc/qianfan-docs/s/Jm8r1826a",
       "http_status": 200,
-      "content_sha256": "50bae6fc8ffe8148403578358d5d5991b904d2e59beef15c4d544ae78341339e",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "2d558fc1482c2764a85d6a0d5ba6aad281466eacb0c209fe2401b456f4dcf085",
+      "changed": true
     },
     {
       "id": "bytedance-pricing",
       "url": "https://www.volcengine.com/docs/84458/1585097?lang=zh",
       "http_status": 200,
-      "content_sha256": "c70ce3985a955a2051954144ff01e7715678499a02102048f17dbedd07e81222",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "7bfb7ed50cd5aff2620431b488603656528e5f4528ace48dbc298d3d731bb8ab",
+      "changed": true
     },
     {
       "id": "tencent-pricing",
       "url": "https://cloud.tencent.com/document/product/1759/127342",
       "http_status": 200,
-      "content_sha256": "4322a14a1cf739d1a76e3f349582dd0a4c04037fb08cb26bd65465ef82527f58",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "2f63ab052bf8e23a48c18f037d98dcbe0412cde49322332da07fa205ed0ea106",
+      "changed": true
     },
     {
       "id": "minimax-pricing",
       "url": "https://platform.minimaxi.com/docs/guides/pricing-paygo",
       "http_status": 200,
-      "content_sha256": "047339bfc05c5914a457cb66348daac89cf1aa8dbb95eef39d58b990e1fcdb27",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "86385d0a0b54661617db73b1eb095624b15dcce7136c6cdd7d3d5e640326bd4a",
+      "changed": true
     },
     {
       "id": "stepfun-pricing",
       "url": "https://platform.stepfun.ai/docs/en/guides/pricing/details",
       "http_status": 200,
-      "content_sha256": "f2d8ce50b2af40a24a205724963da6021612878d94791b462e5d09853fc073e4",
-      "fetch_method": "curl-fallback",
-      "changed": true,
-      "change_kind": "new_source_baseline"
+      "content_sha256": "d140ce399219880f680b9fef3d754bea0c55daec99935884ad53ba89d613d887",
+      "changed": true
     },
     {
       "id": "cursor-pricing",
       "url": "https://docs.cursor.com/account/pricing",
       "http_status": 200,
-      "content_sha256": "460bef6b04b64d6f99c3838717add738b69d048e0fc8264471c2be5746b2fc09",
+      "content_sha256": "021b7740d616c8bedc7554d18e78db08df61e2366daa118de6032fed318831b8",
       "changed": true
     },
     {
       "id": "kiro-models",
       "url": "https://kiro.dev/docs/models",
       "http_status": 200,
-      "content_sha256": "4d46ba0521147a105f05e64de6b9972e05e78565cc9e672da7761d5727812b4a",
+      "content_sha256": "fa216b346afbfa2748d128440dc0b3d64341771baffa441f083c089cf14d6a78",
       "changed": true
     },
     {
       "id": "github-copilot-model-pricing",
       "url": "https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing",
       "http_status": 200,
-      "content_sha256": "3cfb07ffad05fc7bf04ad56939724dc459b14636dd66817a4bd678fb37f843f3",
+      "content_sha256": "f096a32c4fd254aa29845e388e3a6aabf19266b583acc29111a6e4b5d50f135d",
       "changed": true
     },
     {
       "id": "windsurf-models",
       "url": "https://docs.windsurf.com/windsurf/models",
       "http_status": 200,
-      "content_sha256": "b1f0af5ce32cabd46f3522bca1a79a72962f4dff15d05b41008bd4cfbc942046",
-      "fetch_method": "curl-fallback",
+      "content_sha256": "62fb4c5c5b5fb1d69445a267fdbd3d1037cf80c04211600d37de9dbfb30e8853",
       "changed": true
     },
     {
       "id": "cline-model-providers",
       "url": "https://docs.cline.bot/getting-started/authorizing-with-cline",
       "http_status": 200,
-      "content_sha256": "89e917c09104320cbebe150ad51f520bc9839da6b5c87a5c38e8273c2e71d882",
-      "fetch_method": "curl-fallback",
+      "content_sha256": "b8dee78e4f3387701084e055cd0c9463931cd9e01f725a6bc26979c6f1229a7f",
       "changed": true
     },
     {
       "id": "agent-plan-kiro",
       "url": "https://kiro.dev/pricing/",
       "http_status": 200,
-      "content_sha256": "44b975f4367dcc42fac8347b1ec0574d2892808bba2fae2520068fecc10f8ed4",
+      "content_sha256": "8eecb6b878a66bb83ba09d8b8858380349427a8cc7e9c658e4e104269803d6c0",
       "changed": true
     },
     {
       "id": "agent-plan-github-copilot",
       "url": "https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals",
       "http_status": 200,
-      "content_sha256": "1fe63b5cd8e77351a2a0a4163b342dc8680777c77762f7e35b3521a6a25f6bdc",
+      "content_sha256": "6ca5a8d5d554b1fd67f1883658f88c0e1b9d76e80e9796c8a84cd64a6b6d31c0",
       "changed": true
     },
     {
       "id": "agent-plan-windsurf",
       "url": "https://docs.windsurf.com/windsurf/accounts/usage",
       "http_status": 200,
-      "content_sha256": "fc354162bcb640c5bd76b89556c92af6ca91e60d2ff14438209a2d48c19d8923",
-      "fetch_method": "curl-fallback",
+      "content_sha256": "05e2502cc27f56803e77590f9aa0556ab8c68328327023846e63f0bc5040af5f",
       "changed": true
     }
   ]
